@@ -5,7 +5,7 @@ import "src/action"
 // 设置路由
 func setRouter() {
 	{
-		manager := new(action.Manager)
-		App.Router.GET("/auth", manager.Auth)
+		index := new(action.Index)
+		App.Router.GET("/", index.Demo)
 	}
 }
