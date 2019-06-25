@@ -27,6 +27,10 @@ var Config struct {
 		EnableNotFound         bool
 		EnableMethodNotAllowed bool
 	}
+	Snowflake struct {
+		Epoch int64
+		Node  int64
+	}
 	Database struct {
 		Addr      string
 		User      string

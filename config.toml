@@ -28,6 +28,13 @@ enableNotFound = false
 # 启用405错误记录
 enableMethodNotAllowed = false
 
+# snowflake算法参数
+[snowflake]
+# epoch值
+epoch = 0
+# 节点值
+node = 0
+
 # 数据库
 [database]
 # 地址
