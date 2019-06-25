@@ -22,6 +22,12 @@ func main() {
 		return
 	}
 
+	// 设置ID节点
+	if err := global.SetIDnode(); err != nil {
+		global.ServiceLogger.Error(err.Error())
+		return
+	}
+
 	// 设置数据库
 	if err := global.SetDatabase(); err != nil {
 		global.ServiceLogger.Error(err.Error())
