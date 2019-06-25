@@ -3,6 +3,7 @@ module src
 go 1.12
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dxvgef/tsing v0.4.2
 	github.com/go-pg/pg v8.0.4+incompatible
 	github.com/jinzhu/inflection v1.0.0 // indirect
