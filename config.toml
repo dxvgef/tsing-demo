@@ -27,3 +27,18 @@ enableCaller = true
 enableNotFound = false
 # 启用405错误记录
 enableMethodNotAllowed = false
+
+# 数据库
+[database]
+# 地址
+addr = "127.0.0.1:5432"
+# 账号
+user = "postgres"
+# 密码
+password = "123456"
+# 库名
+name = "demo"
+# 记用SQL语句记录
+enableLog = true
+# 读写超时（秒）
+timeout = 10
