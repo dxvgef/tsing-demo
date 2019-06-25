@@ -1,0 +1,29 @@
+# 服务
+[service]
+# 监听地址
+ip = ""
+# 监听端口
+port = 3000
+# 退出等待超时时间（秒）
+quitWaitTimeout = 5
+# 调试模式，会将详细的错误信息输出给客户端
+debug = true
+
+# 日志记录器
+[logger]
+# 记录级别
+level = "debug"
+# 日志输出方式，用|符号分隔多个
+outputs = "stderr"
+# 日志输出编码，支持json,console
+encode = "console"
+# 彩色显示level
+colorLevel = false
+# 启用错误跟踪记录
+enableTrace = true
+# 启用调用信息记录
+enableCaller = true
+# 启用404错误记录
+enableNotFound = false
+# 启用405错误记录
+enableMethodNotAllowed = false
