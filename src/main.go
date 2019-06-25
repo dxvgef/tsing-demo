@@ -11,16 +11,20 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	// 设置全局配置
-	err := global.SetConfig()
-	if err != nil {
+	if err := global.SetConfig(); err != nil {
 		log.Println(err.Error())
 		return
 	}
 
 	// 设置日志记录器
-	err = global.SetLogger()
-	if err != nil {
+	if err := global.SetLogger(); err != nil {
 		log.Println(err.Error())
+		return
+	}
+
+	// 设置数据库
+	if err := global.SetDatabase(); err != nil {
+		global.ServiceLogger.Error(err.Error())
 		return
 	}
 
