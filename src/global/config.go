@@ -27,6 +27,14 @@ var Config struct {
 		EnableNotFound         bool
 		EnableMethodNotAllowed bool
 	}
+	Database struct {
+		Addr      string
+		User      string
+		Password  string
+		Name      string
+		EnableLog bool
+		Timeout   int
+	}
 }
 
 // 解析配置文件路径
