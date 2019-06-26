@@ -1,13 +1,14 @@
 package action
 
 import (
-	"errors"
-
 	"github.com/dxvgef/tsing"
 )
 
 type Index struct{}
 
-func (Index) Demo(ctx tsing.Context) error {
-	return ctx.Event(errors.New("test"))
+func (Index) Json(ctx tsing.Context) error {
+	respData := makeRespMapData()
+	respData.Data["username"] = "test"
+	respData.Data["password"] = "123456"
+	return JSON(ctx, 200, respData)
 }
