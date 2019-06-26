@@ -18,6 +18,12 @@ type RespData struct {
 	Data  interface{}
 }
 
+// 构建一个RespMapData
+func makeRespMapData() (respData RespMapData) {
+	respData.Data = make(map[string]interface{})
+	return
+}
+
 // 输出JSON数据给客户端
 func JSON(ctx tsing.Context, status int, data interface{}) error {
 	dataBytes, err := json.Marshal(data)
