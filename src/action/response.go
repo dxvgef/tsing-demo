@@ -6,16 +6,16 @@ import (
 	"github.com/dxvgef/tsing"
 )
 
-// 响应多键值的数据
-type RespMapData struct {
-	Error string
-	Data  map[string]interface{}
-}
-
 // 响应单键值的数据
 type RespData struct {
-	Error string
-	Data  interface{}
+	Error string      `json:"error"`
+	Data  interface{} `json:"data"`
+}
+
+// 响应多键值的数据
+type RespMapData struct {
+	Error string                 `json:"error"`
+	Data  map[string]interface{} `json:"data"`
 }
 
 // 构建一个RespMapData
