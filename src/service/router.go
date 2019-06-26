@@ -6,6 +6,6 @@ import "src/action"
 func setRouter() {
 	{
 		index := new(action.Index)
-		App.Router.GET("/", index.Demo)
+		App.Router.GET("/", index.Json)
 	}
 }
