@@ -12,11 +12,17 @@ var DB *pg.DB
 // QueryHook 查询钩子
 type QueryHook struct{}
 
-// BeforeQuery
-func (QueryHook) BeforeQuery(qe *pg.QueryEvent) {}
+// BeforeQuery 查询前钩子
+func (QueryHook) BeforeQuery(qe *pg.QueryEvent) {
+	// 连接数据库
+	if err := SetDatabase(); err != nil {
+		ServiceLogger.Error(err.Error())
+	}
+}
 
-// AfterQuery
+// AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(qe *pg.QueryEvent) {
+	// 记录SQL语句
 	stmt, _ := qe.FormattedQuery()
 	ServiceLogger.Debug(stmt)
 }
