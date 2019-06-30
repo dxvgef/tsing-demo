@@ -9,13 +9,13 @@ import (
 // 响应单键值的数据
 type RespData struct {
 	Error string      `json:"error"`
-	Data  interface{} `json:"data"`
+	Data  interface{} `json:"data,omitempty"`
 }
 
 // 响应多键值的数据
 type RespMapData struct {
 	Error string                 `json:"error"`
-	Data  map[string]interface{} `json:"data"`
+	Data  map[string]interface{} `json:"data,omitempty"`
 }
 
 // 构建一个RespMapData
