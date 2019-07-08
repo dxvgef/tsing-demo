@@ -20,10 +20,10 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
-github.com/dxvgef/filter v0.0.0-20190412171250-7c050626f767 h1:m6Ie4xxPUoBOk1nXGeMbQh3f24MDhtWLO8W2F4VoBzc=
-github.com/dxvgef/filter v0.0.0-20190412171250-7c050626f767/go.mod h1:mkBsz8jewjNYpbcAOR55gtXbqv4K2Kczz5jirlgMKcc=
-github.com/dxvgef/tsing v0.4.2 h1:7pQRiFavRkDIee0D+xWIp0UeY49dNBdm/PemYBjex7Y=
-github.com/dxvgef/tsing v0.4.2/go.mod h1:aWUbsDoYdRhBudgzOVEkT4vau0yB7seJFflRO1noinQ=
+github.com/dxvgef/filter v1.0.0 h1:qbh0QUcIozrbkOxcKQn7J+NATJmx74g+ClRh2YCGpOQ=
+github.com/dxvgef/filter v1.0.0/go.mod h1:mkBsz8jewjNYpbcAOR55gtXbqv4K2Kczz5jirlgMKcc=
+github.com/dxvgef/tsing v0.5.0 h1:ulvORHA2Y7atd8T6WnKSK8qHZ9rfsNOa5O9Byri9uuM=
+github.com/dxvgef/tsing v0.5.0/go.mod h1:UdBZ8H9HluNTxhExkNX//RhzrL636laqVmBBpjleDPQ=
 github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV9I=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
