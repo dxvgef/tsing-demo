@@ -2,6 +2,7 @@ package action
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/dxvgef/tsing"
 )
@@ -43,4 +44,10 @@ func String(ctx tsing.Context, status int, data string) error {
 	ctx.ResponseWriter.WriteHeader(status)
 	_, err := ctx.ResponseWriter.Write([]byte(data))
 	return err
+}
+
+// 输出204状态码
+func NotContent(ctx tsing.Context) error {
+	ctx.ResponseWriter.WriteHeader(http.StatusNoContent)
+	return nil
 }

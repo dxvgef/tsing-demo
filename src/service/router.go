@@ -1,11 +1,18 @@
 package service
 
-import "src/action"
+import (
+	"src/action"
+)
 
 // 设置路由
 func setRouter() {
 	{
-		index := new(action.Index)
-		App.Router.GET("/", index.Json)
+		index := new(action.Example)
+		App.Router.GET("/", index.SignJWT)
+
+		{
+			admin := App.Router.GROUP("/admin", action.CheckJWT)
+			admin.GET("", index.Admin)
+		}
 	}
 }
