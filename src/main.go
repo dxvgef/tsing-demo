@@ -34,6 +34,12 @@ func main() {
 		return
 	}
 
+	// 设置Session
+	if err := global.SetSessions(); err != nil {
+		global.ServiceLogger.Error(err.Error())
+		return
+	}
+
 	// 启动服务
 	service.Start()
 }

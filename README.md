@@ -1,5 +1,5 @@
 # tsing-demo
-tsing框架的整合演示，整合了如下功能：
+Tsing框架的整合演示，整合了如下功能：
 - JSON和String 输出
 - dxvgef/filter (参数值过滤器)
 - go-pg/pg (Postgresql 数据库ORM)
@@ -7,3 +7,4 @@ tsing框架的整合演示，整合了如下功能：
 - bwmarrin/snowflake (Snowflake ID算法)
 - spf13/viper (多格式配置文件读写)
 - gbrlsnchs/jwt (JSON Web Token)
+- dxvgef/sessions 基于Redis存储的Session

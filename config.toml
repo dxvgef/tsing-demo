@@ -49,3 +49,23 @@ name = "demo"
 enableLog = true
 # 读写超时（秒）
 timeout = 10
+
+[session]
+# sessionid的值加密密钥，密钥的长度16,24,32对应AES-128,AES-192,AES-256算
+key = "0123456789012345"
+# sessionid的cookie键名
+cookieName = "sessionid"
+# HTTP Only
+httpOnly = false
+# 启用HTTPS
+secure = false
+# 最大生命周期(分)
+maxAge = 60
+# 空闲超时(分)
+idleTime = 40
+# redis地址:端口
+redisAddr = "127.0.0.1:6379"
+# redis的库序号
+redisDB = 0
+# redis的键名前缀
+redisKeyPrefix = "sess_"

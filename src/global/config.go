@@ -39,6 +39,17 @@ var Config struct {
 		EnableLog bool
 		Timeout   int
 	}
+	Session struct {
+		Key            string
+		CookieName     string
+		HTTPOnly       bool
+		Secure         bool
+		MaxAge         int
+		IdleTime       int
+		RedisAddr      string
+		RedisDB        int
+		RedisKeyPrefix string
+	}
 }
 
 // 解析配置文件路径

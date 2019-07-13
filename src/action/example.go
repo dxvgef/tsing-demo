@@ -6,6 +6,8 @@ import (
 	"github.com/dxvgef/filter"
 	"github.com/dxvgef/tsing"
 	"github.com/gbrlsnchs/jwt/v3"
+
+	"src/global"
 )
 
 type AccessToken struct {
@@ -31,6 +33,26 @@ func (Example) SignJWT(ctx tsing.Context) error {
 		return ctx.Event(err)
 	}
 	respData.Data = string(token)
+
+	return JSON(ctx, 200, respData)
+}
+
+func (Example) Session(ctx tsing.Context) error {
+	var respData RespData
+
+	session, err := global.Session.Use(ctx.Request, ctx.ResponseWriter)
+	if err != nil {
+		return ctx.Event(err)
+	}
+	if err := session.Set("test", "tsing"); err != nil {
+		return ctx.Event(err)
+	}
+
+	sessValue, err := session.Get("test").String()
+	if err != nil {
+		return ctx.Event(err)
+	}
+	respData.Data = sessValue
 
 	return JSON(ctx, 200, respData)
 }
