@@ -9,7 +9,7 @@ import (
 
 func CheckJWT(ctx tsing.Context) (tsing.Context, error) {
 	respData := makeRespMapData()
-	tokenStr, err := ctx.FormValue("token")
+	tokenStr, err := ctx.FormValueStrict("token")
 	if err != nil {
 		respData.Error = err.Error()
 		err := JSON(ctx, 401, respData)

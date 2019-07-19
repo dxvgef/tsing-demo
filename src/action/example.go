@@ -65,9 +65,9 @@ func (Example) Admin(ctx tsing.Context) error {
 	// 过滤多个元素
 	err := filter.MSet(
 		// 要过滤的元素
-		filter.El(&reqData.username, filter.FromString(ctx.RawQueryValue("username"), "账号").
+		filter.El(&reqData.username, filter.FromString(ctx.QueryValue("username"), "账号").
 			RemoveSpace().MinLength(3).MaxLength(16)), // 要求最大长度
-		filter.El(&reqData.password, filter.FromString(ctx.RawQueryValue("password"), "密码").
+		filter.El(&reqData.password, filter.FromString(ctx.QueryValue("password"), "密码").
 			MinLength(6).MaxLength(32).HasDigit().HasUpper().HasLower().HasSymbol(),
 		),
 	)
