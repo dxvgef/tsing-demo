@@ -15,8 +15,9 @@ import (
 )
 
 var App *tsing.App
+var AppServer *http.Server
 
-func Start() {
+func Config() {
 	App = tsing.New()
 	App.Event.EnableTrace = global.Config.Logger.EnableTrace
 	App.Event.ShortCaller = true
@@ -26,7 +27,7 @@ func Start() {
 	setRouter()
 
 	// 定义HTTP服务
-	svr := &http.Server{
+	AppServer = &http.Server{
 		Addr:    global.Config.Service.IP + ":" + strconv.Itoa(global.Config.Service.Port),
 		Handler: App, // 调度器
 		// ErrorLog:          global.ServiceLogger, // 错误日志记录器
@@ -35,11 +36,14 @@ func Start() {
 		IdleTimeout:       10 * time.Second, // 连接空闲超时
 		ReadHeaderTimeout: 10 * time.Second, // http header读取超时
 	}
+}
 
+func Start() {
+	Config()
 	// 在新协程中启动服务，方便实现退出等待
 	go func() {
-		global.ServiceLogger.Info("HTTP服务 " + svr.Addr + " 启动成功")
-		if err := svr.ListenAndServe(); err != nil {
+		global.ServiceLogger.Info("HTTP服务 " + AppServer.Addr + " 启动成功")
+		if err := AppServer.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
 				global.ServiceLogger.Info("服务已退出")
 			} else {
@@ -55,7 +59,7 @@ func Start() {
 	// 指定退出超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.Config.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
-	if err := svr.Shutdown(ctx); err != nil {
+	if err := AppServer.Shutdown(ctx); err != nil {
 		global.ServiceLogger.Error(err.Error())
 	}
 }
