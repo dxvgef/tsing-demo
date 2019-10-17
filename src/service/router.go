@@ -9,10 +9,10 @@ func setRouter() {
 
 	handler := new(action.Example)
 
-	App.Router.GET("/sign", handler.SignJWT)
-	App.Router.GET("/session", handler.Session)
+	app.Router.GET("/sign", handler.SignJWT)
+	app.Router.GET("/session", handler.Session)
 	{
-		adminRouter := App.Router.GROUP("/admin", action.CheckJWT)
+		adminRouter := app.Router.GROUP("/admin", action.CheckJWT)
 		adminRouter.GET("", handler.Admin)
 	}
 }
