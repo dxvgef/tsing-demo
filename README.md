@@ -8,3 +8,4 @@ Tsing框架的整合演示，整合了如下功能：
 - spf13/viper (多格式配置文件读写)
 - gbrlsnchs/jwt (JSON Web Token)
 - dxvgef/sessions 基于Redis存储的Session
+- pprof分析服务

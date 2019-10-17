@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dxvgef/tsing"
-
 	"local/action"
 	"local/global"
+
+	"github.com/dxvgef/tsing"
 )
 
 var app *tsing.App
@@ -28,6 +28,11 @@ func Config() {
 
 	// 设置路由
 	setRouter()
+
+	// 如果是调试模式，注册pprof路由
+	if global.Config.Service.Debug {
+		pprofRouter()
+	}
 
 	// 定义HTTP服务
 	appServer = &http.Server{
