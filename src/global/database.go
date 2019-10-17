@@ -16,7 +16,7 @@ type QueryHook struct{}
 func (QueryHook) BeforeQuery(qe *pg.QueryEvent) {
 	// 连接数据库
 	if err := SetDatabase(); err != nil {
-		ServiceLogger.Error(err.Error())
+		Logger.Caller.Error(err.Error())
 	}
 }
 
@@ -24,7 +24,7 @@ func (QueryHook) BeforeQuery(qe *pg.QueryEvent) {
 func (QueryHook) AfterQuery(qe *pg.QueryEvent) {
 	// 记录SQL语句
 	stmt, _ := qe.FormattedQuery()
-	ServiceLogger.Debug(stmt)
+	Logger.Default.Debug(stmt)
 }
 
 // SetDatabase 设置数据库
@@ -46,20 +46,19 @@ func SetDatabase() error {
 
 	// 连接数据库
 	DB = pg.Connect(&pg.Options{
-		Addr:     Config.Database.Addr,
-		User:     Config.Database.User,
-		Password: Config.Database.Password,
-		Database: Config.Database.Name,
+		Addr:         Config.Database.Addr,
+		User:         Config.Database.User,
+		Password:     Config.Database.Password,
+		Database:     Config.Database.Name,
+		ReadTimeout:  time.Duration(Config.Database.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(Config.Database.WriteTimeout) * time.Second,
+		PoolSize:     Config.Database.PoolSize,
 	})
 
-	// 读写超时（秒）
-	if Config.Database.Timeout > 0 {
-		DB.WithTimeout(time.Duration(Config.Database.Timeout) * time.Second)
-	}
-
 	// 启用查询日志，将记录SQL语句
-	if Config.Database.EnableLog == true {
+	if Config.Database.StmtLog == true {
 		DB.AddQueryHook(QueryHook{})
 	}
+
 	return nil
 }

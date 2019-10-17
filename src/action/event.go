@@ -4,51 +4,67 @@ import (
 	"net/http"
 
 	"github.com/dxvgef/tsing"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
-	"src/global"
+	"local/global"
 )
 
-func EventHandler(event tsing.Event) {
-	// 状态码
+// tsing的事件处理器
+func EventHandler(event *tsing.Event) {
+	// 先输出状态码
 	event.ResponseWriter.WriteHeader(event.Status)
 
+	// 根据状态码做不同的日志处理
 	switch event.Status {
 	case 404:
-		// 如果配置文件禁用404记录
-		if global.Config.Logger.EnableNotFound == true {
-			global.ServiceLogger.Error(event.Request.Method + " " + event.Request.RequestURI + " " + http.StatusText(event.Status))
+		if global.Config.Service.NotFoundEvent == true {
+			global.Logger.Default.Error(
+				event.Message.Error(),
+				zap.Int("status", event.Status),
+				zap.String("method", event.Request.Method),
+				zap.String("uri", event.Request.RequestURI),
+			)
 		}
 	case 405:
-		if global.Config.Logger.EnableMethodNotAllowed == true {
-			global.ServiceLogger.Error(event.Request.Method + " " + event.Request.RequestURI + " " + http.StatusText(event.Status))
+		if global.Config.Service.MethodNotAllowedEvent == true {
+			global.Logger.Default.Warn(
+				event.Message.Error(),
+				zap.Int("status", event.Status),
+				zap.String("method", event.Request.Method),
+				zap.String("uri", event.Request.RequestURI),
+			)
 		}
 	case 500:
-		var trace string
-		if global.Config.Logger.EnableTrace == true {
-			l := len(event.Trace)
-			if l == 1 {
-				trace = event.Trace[0]
-			} else {
-				for i := 0; i < l; i++ {
-					if event.Trace[i] != ":0" {
-						if i > 0 {
-							trace += "\r\n"
-						}
-						trace += event.Trace[i]
-					}
-				}
+		var fields []zapcore.Field
+		fields = append(fields, zap.Int("status", event.Status))
+		fields = append(fields, zap.String("file", event.Trigger.File))
+		fields = append(fields, zap.Int("line", event.Trigger.Line))
+		fields = append(fields, zap.String("func", event.Trigger.Func))
+		if global.Config.Service.EventTrigger == true {
+			fields = append(fields, zap.String("file", event.Trigger.File))
+			fields = append(fields, zap.Int("line", event.Trigger.Line))
+			fields = append(fields, zap.String("func", event.Trigger.Func))
+		}
+
+		if global.Config.Service.EventTrace == true {
+			var trace []string
+			for k := range event.Trace {
+				trace = append(trace, event.Trace[k])
 			}
+			fields = append(fields, zap.Strings("trace", trace))
 		}
-		if len(event.Trace) == 1 {
-			global.ServiceLogger.Error(trace + " " + event.Message.Error())
-		} else {
-			global.ServiceLogger.Error(event.Message.Error() + "\r\n" + trace)
-		}
+
+		global.Logger.Default.Error(event.Message.Error(), fields...)
 	}
 
 	if global.Config.Service.Debug == true {
-		event.ResponseWriter.Write([]byte(event.Message.Error()))
+		if _, err := event.ResponseWriter.Write([]byte(event.Message.Error())); err != nil {
+			global.Logger.Default.Error(err.Error())
+		}
 	} else {
-		event.ResponseWriter.Write([]byte(http.StatusText(event.Status)))
+		if _, err := event.ResponseWriter.Write([]byte(http.StatusText(event.Status))); err != nil {
+			global.Logger.Default.Error(err.Error())
+		}
 	}
 }

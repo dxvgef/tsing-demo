@@ -7,7 +7,7 @@ import (
 	"github.com/dxvgef/tsing"
 	"github.com/gbrlsnchs/jwt/v3"
 
-	"src/global"
+	"local/global"
 )
 
 type AccessToken struct {
@@ -20,7 +20,7 @@ type AccessToken struct {
 
 type Example struct{}
 
-func (Example) SignJWT(ctx tsing.Context) error {
+func (*Example) SignJWT(ctx *tsing.Context) error {
 	var respData RespData
 	var accessToken AccessToken
 	accessToken.Data.ID = 123
@@ -37,7 +37,7 @@ func (Example) SignJWT(ctx tsing.Context) error {
 	return JSON(ctx, 200, respData)
 }
 
-func (Example) Session(ctx tsing.Context) error {
+func (*Example) Session(ctx *tsing.Context) error {
 	var respData RespData
 
 	session, err := global.Session.Use(ctx.Request, ctx.ResponseWriter)
@@ -57,7 +57,7 @@ func (Example) Session(ctx tsing.Context) error {
 	return JSON(ctx, 200, respData)
 }
 
-func (Example) Admin(ctx tsing.Context) error {
+func (*Example) Admin(ctx *tsing.Context) error {
 	var reqData struct {
 		username string
 		password string

@@ -12,32 +12,41 @@ import (
 // Config 全局配置
 var Config struct {
 	Service struct {
-		IP              string
-		Port            int
-		QuitWaitTimeout int
-		Debug           bool
+		IP                    string
+		Port                  int
+		ReadTimeout           int
+		ReadHeaderTimeout     int
+		WriteTimeout          int
+		IdleTimeout           int
+		QuitWaitTimeout       int
+		Debug                 bool
+		EventTrigger          bool
+		EventTrace            bool
+		NotFoundEvent         bool
+		MethodNotAllowedEvent bool
+		HandleOPTIONS         bool
+		FixPath               bool
+		RedirectTrailingSlash bool
 	}
 	Logger struct {
-		Level                  string
-		Outputs                string
-		Encode                 string
-		ColorLevel             bool
-		EnableTrace            bool
-		EnableCaller           bool
-		EnableNotFound         bool
-		EnableMethodNotAllowed bool
+		Level      string
+		Outputs    string
+		Encode     string
+		ColorLevel bool
 	}
 	Snowflake struct {
 		Epoch int64
 		Node  int64
 	}
 	Database struct {
-		Addr      string
-		User      string
-		Password  string
-		Name      string
-		EnableLog bool
-		Timeout   int
+		Addr         string
+		User         string
+		Password     string
+		Name         string
+		StmtLog      bool
+		ReadTimeout  int
+		WriteTimeout int
+		PoolSize     int
 	}
 	Session struct {
 		Key            string

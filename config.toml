@@ -1,13 +1,36 @@
 # 服务
 [service]
-# 监听地址
+# 监听地址，留空表示监听0.0.0.0
 ip = ""
 # 监听端口
 port = 3000
+# 读取超时(秒)
+readTimeout = 10
+# 头信息读取超时（秒）
+readHeaderTimeout = 10
+# 响应超时(秒)
+writeTimeout = 10
+# 空闲超时(秒)
+idleTimeout = 10
 # 退出等待超时时间（秒）
 quitWaitTimeout = 5
 # 调试模式，会将详细的错误信息输出给客户端
 debug = true
+# 记录触发信息(影响性能)
+eventTrigger = false
+# 记录跟踪信息(影响性能)
+eventTrace = true
+# 记录404错误
+notFoundEvent = true
+# 记录405错误
+methodNotAllowedEvent = true
+# 自动处理HTTP OPTIONS方法请求(响应200状态码)
+handleOPTIONS = true
+# 自动修复URL中的路径分隔符问题
+fixPath = true
+# 重定向到类似的路由
+# 例如/abc/如果没有匹配到路由，但存在/abc路由，则自动重写向到后者
+RedirectTrailingSlash = false
 
 # 日志记录器
 [logger]
@@ -18,15 +41,7 @@ outputs = "stderr"
 # 日志输出编码，支持json,console
 encode = "console"
 # 彩色显示level
-colorLevel = false
-# 启用错误跟踪记录
-enableTrace = true
-# 启用调用信息记录
-enableCaller = true
-# 启用404错误记录
-enableNotFound = false
-# 启用405错误记录
-enableMethodNotAllowed = false
+colorLevel = true
 
 # snowflake算法参数
 [snowflake]
@@ -45,10 +60,14 @@ user = "postgres"
 password = "123456"
 # 库名
 name = "demo"
-# 记用SQL语句记录
-enableLog = true
-# 读写超时（秒）
-timeout = 10
+# 记录SQL语句
+stmtLog = true
+# 读超时(秒)
+readTimeout = 10
+# 写超时(秒)
+writeTimeout =10
+# 连接池大小
+poolSize = 200
 
 [session]
 # sessionid的值加密密钥，密钥的长度16,24,32对应AES-128,AES-192,AES-256算

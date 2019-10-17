@@ -1,6 +1,7 @@
 package global
 
 import (
+	"log"
 	"strings"
 	"time"
 
@@ -8,25 +9,32 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Logger 业务逻辑日志记录器
-var Logger *zap.Logger
+var Logger struct {
+	Default  *zap.Logger // 默认logger，不带caller信息
+	Caller   *zap.Logger // 带caller信息的logger
+	StdError *log.Logger // 实现标准包log的logger，级别为error
+}
 
-// ServiceLogger 服务日志记录器
-var ServiceLogger *zap.Logger
-
-// SetLogger 设置logger
+// 设置logger
 func SetLogger() error {
 	var err error
 
+	level := strings.ToLower(Config.Logger.Level)
 	// 设置日志记录级别
 	var zapLevel zapcore.Level
-	switch Config.Logger.Level {
+	switch level {
 	case "info":
 		zapLevel = zapcore.InfoLevel
 	case "warn":
 		zapLevel = zapcore.WarnLevel
 	case "error":
 		zapLevel = zapcore.ErrorLevel
+	case "dpanic":
+		zapLevel = zapcore.DPanicLevel
+	case "panic":
+		zapLevel = zapcore.PanicLevel
+	case "fatal":
+		zapLevel = zapcore.FatalLevel
 	default:
 		zapLevel = zapcore.DebugLevel
 	}
@@ -55,42 +63,27 @@ func SetLogger() error {
 		EncodeCaller: zapcore.ShortCallerEncoder, // Caller的编码器
 	}
 
-	var disableStacktrace bool
-	var disableCaller bool
-	if Config.Logger.EnableCaller == false {
-		disableStacktrace = true
-	}
-	if Config.Logger.EnableCaller == false {
-		disableCaller = true
-	}
-
 	// 设置Logger
-	Logger, err = zap.Config{
-		Level:             zap.NewAtomicLevelAt(zapLevel), // 日志记录级别
-		Development:       Config.Service.Debug,           // 开发模式
-		Encoding:          Config.Logger.Encode,           // 日志格式json/console
-		EncoderConfig:     encoderConfig,                  // 编码器配置
-		OutputPaths:       outputs,                        // 输出路径
-		DisableStacktrace: disableStacktrace,              // 屏蔽堆栈跟踪
-		DisableCaller:     disableCaller,                  // 屏蔽调用信息
-	}.Build()
-	if err != nil {
-		return err
-	}
-
-	// 设置ServiceLogger
-	ServiceLogger, err = zap.Config{
+	Logger.Default, err = zap.Config{
 		Level:             zap.NewAtomicLevelAt(zapLevel), // 日志记录级别
 		Development:       Config.Service.Debug,           // 开发模式
 		Encoding:          Config.Logger.Encode,           // 日志格式json/console
 		EncoderConfig:     encoderConfig,                  // 编码器配置
 		OutputPaths:       outputs,                        // 输出路径
 		DisableStacktrace: true,                           // 屏蔽堆栈跟踪
-		DisableCaller:     true,                           // 屏蔽跟踪
+		DisableCaller:     true,                           // 屏蔽调用信息
 	}.Build()
 	if err != nil {
 		return err
 	}
 
+	// 将Logger转为log.Logger，级别为error
+	Logger.StdError, err = zap.NewStdLogAt(Logger.Default, zap.ErrorLevel)
+	if err != nil {
+		return err
+	}
+
+	// 带caller的logger
+	Logger.Caller = Logger.Default.WithOptions(zap.AddCaller())
 	return err
 }
