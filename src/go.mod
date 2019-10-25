@@ -1,12 +1,12 @@
 module local
 
-go 1.12
+go 1.13
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dxvgef/filter v1.3.1
 	github.com/dxvgef/sessions v0.3.0
-	github.com/dxvgef/tsing v0.7.1
+	github.com/dxvgef/tsing v0.7.2
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.0
 	github.com/go-pg/pg v8.0.6+incompatible
@@ -22,13 +22,13 @@ require (
 	github.com/spf13/viper v1.4.0
 	github.com/stretchr/testify v1.3.0 // indirect
 	go.uber.org/multierr v1.2.0 // indirect
-	go.uber.org/zap v1.10.0
+	go.uber.org/zap v1.11.0
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
-	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
+	golang.org/x/sys v0.0.0-20191025090151-53bf42e6b339 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 // indirect
 	mellium.im/sasl v0.2.1 // indirect
 )
 
-replace github.com/dxvgef/tsing => /Users/dxvgef/Documents/Projects/open-source/tsing
+// replace github.com/dxvgef/tsing => /Users/dxvgef/Projects/open/tsing
