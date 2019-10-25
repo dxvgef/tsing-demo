@@ -30,7 +30,7 @@ func (*Example) SignJWT(ctx *tsing.Context) error {
 	alg := jwt.NewHS256([]byte("secret"))
 	token, err := jwt.Sign(accessToken, alg)
 	if err != nil {
-		return ctx.Event(err)
+		return err
 	}
 	respData.Data = string(token)
 
@@ -42,15 +42,15 @@ func (*Example) Session(ctx *tsing.Context) error {
 
 	session, err := global.Session.Use(ctx.Request, ctx.ResponseWriter)
 	if err != nil {
-		return ctx.Event(err)
+		return err
 	}
 	if err := session.Set("test", "tsing"); err != nil {
-		return ctx.Event(err)
+		return err
 	}
 
 	sessValue, err := session.Get("test").String()
 	if err != nil {
-		return ctx.Event(err)
+		return err
 	}
 	respData.Data = sessValue
 
@@ -72,7 +72,7 @@ func (*Example) Admin(ctx *tsing.Context) error {
 		),
 	)
 	if err != nil {
-		return ctx.Event(err)
+		return err
 	}
 	return String(ctx, 200, "Hello Tsing")
 }

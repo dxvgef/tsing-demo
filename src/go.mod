@@ -7,6 +7,7 @@ require (
 	github.com/dxvgef/filter v1.3.1
 	github.com/dxvgef/sessions v0.3.0
 	github.com/dxvgef/tsing v0.7.1
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.0
 	github.com/go-pg/pg v8.0.6+incompatible
 	github.com/go-redis/redis v6.15.6+incompatible // indirect

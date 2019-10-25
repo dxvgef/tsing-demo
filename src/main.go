@@ -11,7 +11,7 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	// 设置全局配置
-	if err := global.SetConfig(); err != nil {
+	if err := global.SetConfig(true); err != nil {
 		log.Fatal(err.Error())
 		return
 	}

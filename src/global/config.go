@@ -2,7 +2,9 @@ package global
 
 import (
 	"flag"
+	"log"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
@@ -58,8 +60,8 @@ var Config struct {
 	}
 }
 
-// 设置全局配置变量
-func SetConfig() error {
+// 设置配置文件
+func SetConfig(watch bool) error {
 	configFilePath := flag.String("c", "./config.toml", "配置文件路径")
 	flag.Parse()
 
@@ -67,5 +69,33 @@ func SetConfig() error {
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}
-	return viper.Unmarshal(&Config)
+
+	if err := LoadConfig(); err != nil {
+		return err
+	}
+
+	if watch {
+		viper.WatchConfig()
+		viper.OnConfigChange(func(e fsnotify.Event) {
+			log.Println("配置文件发生变更，重载配置")
+			if err := LoadConfig(); err != nil {
+				log.Fatalln(err.Error())
+				return
+			}
+		})
+	}
+	return nil
+}
+
+// 加载配置
+func LoadConfig() (err error) {
+	if err = viper.ReadInConfig(); err != nil {
+		log.Println(err.Error())
+		return
+	}
+	if err = viper.Unmarshal(&Config); err != nil {
+		log.Println(err.Error())
+		return
+	}
+	return nil
 }
