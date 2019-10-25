@@ -1,6 +1,6 @@
 module local
 
-go 1.12
+go 1.13
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
@@ -31,4 +31,4 @@ require (
 	mellium.im/sasl v0.2.1 // indirect
 )
 
-replace github.com/dxvgef/tsing => /Users/dxvgef/Documents/Projects/open-source/tsing
+// replace github.com/dxvgef/tsing => /Users/dxvgef/Projects/open/tsing
