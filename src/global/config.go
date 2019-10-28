@@ -1,12 +1,16 @@
 package global
 
 import (
+	"errors"
 	"flag"
 	"log"
 
+	"github.com/BurntSushi/toml"
 	"github.com/fsnotify/fsnotify"
-	"github.com/spf13/viper"
 )
+
+// 配置文件路径(仅在成功加载配置文件并且解析成功后有值)
+var ConfigPath string
 
 // Config 全局配置
 var Config struct {
@@ -61,41 +65,56 @@ var Config struct {
 }
 
 // 设置配置文件
-func SetConfig(watch bool) error {
-	configFilePath := flag.String("c", "./config.toml", "配置文件路径")
-	flag.Parse()
+func SetConfig() error {
+	if ConfigPath == "" {
+		ConfigPath = *flag.String("c", "./config.toml", "配置文件路径")
+		flag.Parse()
+	}
 
-	viper.SetConfigFile(*configFilePath) // 配置文件路径
-	if err := viper.ReadInConfig(); err != nil {
+	_, err := toml.DecodeFile(ConfigPath, &Config)
+	if err != nil {
+		ConfigPath = ""
 		return err
 	}
 
-	if err := LoadConfig(); err != nil {
-		return err
-	}
-
-	if watch {
-		viper.WatchConfig()
-		viper.OnConfigChange(func(e fsnotify.Event) {
-			log.Println("配置文件发生变更，重载配置")
-			if err := LoadConfig(); err != nil {
-				log.Fatalln(err.Error())
-				return
-			}
-		})
-	}
 	return nil
 }
 
-// 加载配置
-func LoadConfig() (err error) {
-	if err = viper.ReadInConfig(); err != nil {
-		log.Println(err.Error())
-		return
+// 监视配置文件更新
+func WatchConfig() error {
+	if ConfigPath == "" {
+		return errors.New("配置文件没有成功解析，无法启动监视")
 	}
-	if err = viper.Unmarshal(&Config); err != nil {
-		log.Println(err.Error())
-		return
-	}
+	// 创建监视器
+	go func() {
+		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer watcher.Close()
+
+		done := make(chan bool)
+		go func() {
+			for {
+				select {
+				case event := <-watcher.Events:
+					if event.Op&fsnotify.Write == fsnotify.Write {
+						log.Println("重载配置文件")
+						if err := SetConfig(); err != nil {
+							panic(err.Error())
+						}
+					}
+				case err := <-watcher.Errors:
+					panic(err.Error())
+				}
+			}
+		}()
+
+		// 添加要监视的文件
+		if err = watcher.Add(ConfigPath); err != nil {
+			panic(err.Error())
+		}
+		<-done
+	}()
 	return nil
 }
