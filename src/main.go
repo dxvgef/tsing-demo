@@ -10,32 +10,38 @@ import (
 func main() {
 	log.SetFlags(log.Lshortfile)
 
-	// 设置全局配置
-	if err := global.SetConfig(true); err != nil {
+	var err error
+	// 设置配置
+	if err = global.SetConfig(); err != nil {
+		log.Fatal(err.Error())
+		return
+	}
+	// 监视并热更新配置
+	if err = global.WatchConfig(); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	// 设置日志记录器
-	if err := global.SetLogger(); err != nil {
+	if err = global.SetLogger(); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
 
 	// 设置ID节点
-	if err := global.SetIDnode(); err != nil {
+	if err = global.SetIDnode(); err != nil {
 		global.Logger.Caller.Fatal(err.Error())
 		return
 	}
 
 	// 设置数据库
-	if err := global.SetDatabase(); err != nil {
+	if err = global.SetDatabase(); err != nil {
 		global.Logger.Caller.Fatal(err.Error())
 		return
 	}
 
 	// 设置Session
-	if err := global.SetSessions(); err != nil {
+	if err = global.SetSessions(); err != nil {
 		global.Logger.Caller.Fatal(err.Error())
 		return
 	}
