@@ -11,11 +11,17 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	var err error
-	// 设置配置
-	if err = global.SetConfig(); err != nil {
+	// 读取TOML配置文件
+	// if err = global.SetTOMLConfig(); err != nil {
+	// 	log.Fatal(err.Error())
+	// 	return
+	// }
+	// 读取YAML配置文件
+	if err = global.SetYAMLConfig(); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
+
 	// 监视并热更新配置
 	if err = global.WatchConfig(); err != nil {
 		log.Fatal(err.Error())
