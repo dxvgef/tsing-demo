@@ -5,7 +5,7 @@ Tsing框架的整合演示，整合了如下功能：
 - go-pg/pg (Postgresql 数据库ORM)
 - uber-go/zap (日志记录器)
 - bwmarrin/snowflake (Snowflake ID算法)
-- spf13/viper (多格式配置文件读写)
+- TOML配置文件读写及监视并热更新
 - gbrlsnchs/jwt (JSON Web Token)
 - dxvgef/sessions 基于Redis存储的Session
 - pprof分析服务
