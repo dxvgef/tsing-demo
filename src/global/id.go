@@ -7,9 +7,9 @@ var IDnode *snowflake.Node
 
 // SetIDnode 设置ID节点
 func SetIDnode() (err error) {
-	if Config.Snowflake.Epoch > 0 {
-		snowflake.Epoch = Config.Snowflake.Epoch
+	if LocalConfig.Snowflake.Epoch > 0 {
+		snowflake.Epoch = LocalConfig.Snowflake.Epoch
 	}
-	IDnode, err = snowflake.NewNode(Config.Snowflake.Node)
+	IDnode, err = snowflake.NewNode(LocalConfig.Snowflake.Node)
 	return
 }

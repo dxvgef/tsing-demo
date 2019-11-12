@@ -1,0 +1,114 @@
+# 运行配置
+run:
+  # 要使用的CPU核心数
+  concurrency: 4
+
+  # 包管理模式，go modules使用readonly
+  modules-download-mode: readonly
+
+
+# 输出配置
+output:
+  # colored-line-number|line-number|json|tab|checkstyle|code-climate, default is "colored-line-number"
+  format: colored-line-number
+
+# 质量检查配置
+linters-settings:
+  # 错误检查
+  errcheck:
+    # 检查类型错误
+    check-type-assertions: false
+
+    # 检查空标识符
+    check-blank: true
+
+    # 忽略文件
+    ignore: fmt:.*,io/ioutil:^Read.*
+
+  govet:
+    # 检查影子变量
+    check-shadowing: true
+
+  # 检查函数的复杂程度
+  gocyclo:
+    # 最小复杂性
+    min-complexity: 10
+  maligned:
+    # 为内存对齐优化给出新的结构体字段排序建议
+    suggest-new: true
+  depguard:
+    list-type: blacklist
+    include-go-root: false
+    packages:
+      - github.com/davecgh/go-spew/spew
+  lll:
+    line-length: 120
+    tab-width: 1
+  unused:
+    check-exported: true
+  unparam:
+    check-exported: false
+  gocritic:
+    enabled-checks:
+    disabled-checks:
+    enabled-tags:
+      - performance
+    settings: # settings passed to gocritic
+      captLocal: # must be valid enabled check name
+        paramsOnly: true
+      rangeValCopy:
+        sizeThreshold: 32
+
+linters:
+  enable:
+    - megacheck
+    - govet
+    - maligned
+    - prealloc
+  enable-all: false
+  disable:
+    - typecheck
+    - unused
+  disable-all: false
+  presets:
+    - bugs
+  fast: true
+
+
+issues:
+  exclude:
+  exclude-rules:
+    # 设置某个目录的排除规则
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
+        - gosec
+
+    - path: internal/hmac/
+      text: "weak cryptographic primitive"
+      linters:
+        - gosec
+
+    # 排序一些staticcheck消息
+    - linters:
+        - staticcheck
+      text: "SA9003:"
+
+    # Exclude lll issues for long lines with go:generate
+    - linters:
+        - lll
+      source: "^//go:generate "
+
+  # Independently from option `exclude` we use default exclude patterns,
+  # it can be disabled by this option. To list all
+  # excluded by default patterns execute `golangci-lint run --help`.
+  # Default value for this option is true.
+  exclude-use-default: false
+
+  # Maximum issues count per one linter. Set to 0 to disable. Default is 50.
+  max-issues-per-linter: 0
+
+  # Maximum count of issues with the same text. Set to 0 to disable. Default is 3.
+  max-same-issues: 0

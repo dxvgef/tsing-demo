@@ -11,13 +11,13 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	var err error
-	// 读取TOML配置文件
-	// if err = global.SetTOMLConfig(); err != nil {
+	// 加载TOML配置文件
+	// if err = global.LoadTOMLConfig(); err != nil {
 	// 	log.Fatal(err.Error())
 	// 	return
 	// }
-	// 读取YAML配置文件
-	if err = global.SetYAMLConfig(); err != nil {
+	// 加载YAML配置文件
+	if err = global.LoadYAMLConfig(); err != nil {
 		log.Fatal(err.Error())
 		return
 	}
@@ -48,6 +48,18 @@ func main() {
 
 	// 设置Session
 	if err = global.SetSessions(); err != nil {
+		global.Logger.Caller.Fatal(err.Error())
+		return
+	}
+
+	// 设置etcd client
+	if err = global.SetETCDClient(); err != nil {
+		global.Logger.Caller.Fatal(err.Error())
+		return
+	}
+
+	// 从etcd加载远程配置
+	if err = global.LoadRemoteConfigFromETCD(); err != nil {
 		global.Logger.Caller.Fatal(err.Error())
 		return
 	}

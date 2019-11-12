@@ -88,3 +88,15 @@ redisAddr = "127.0.0.1:6379"
 redisDB = 0
 # redis的键名前缀
 redisKeyPrefix = "sess_"
+
+[etcd]
+# 服务端点
+endpoints = ["http://127.0.0.1:2379"]
+# 头信息超时时间(秒)
+headerTimeoutPerRequest = 10
+# etcd 账号
+username = ""
+# etcd 密码
+password = ""
+# 键的前缀
+keyPrefix = "/"

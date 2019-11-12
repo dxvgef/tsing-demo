@@ -19,7 +19,7 @@ var Logger struct {
 func SetLogger() error {
 	var err error
 
-	level := strings.ToLower(Config.Logger.Level)
+	level := strings.ToLower(LocalConfig.Logger.Level)
 	// 设置日志记录级别
 	var zapLevel zapcore.Level
 	switch level {
@@ -41,13 +41,13 @@ func SetLogger() error {
 
 	// 配置级别编码器
 	var encodeLevel zapcore.LevelEncoder
-	if Config.Logger.ColorLevel == true && Config.Logger.Encode == "console" {
+	if LocalConfig.Logger.ColorLevel && LocalConfig.Logger.Encode == "console" {
 		encodeLevel = zapcore.CapitalColorLevelEncoder
 	} else {
 		encodeLevel = zapcore.CapitalLevelEncoder
 	}
 
-	outputs := strings.Split(Config.Logger.Outputs, "|")
+	outputs := strings.Split(LocalConfig.Logger.Outputs, "|")
 
 	// 配置编码器的参数
 	encoderConfig := zapcore.EncoderConfig{
@@ -66,8 +66,8 @@ func SetLogger() error {
 	// 设置Logger
 	Logger.Default, err = zap.Config{
 		Level:             zap.NewAtomicLevelAt(zapLevel), // 日志记录级别
-		Development:       Config.Service.Debug,           // 开发模式
-		Encoding:          Config.Logger.Encode,           // 日志格式json/console
+		Development:       LocalConfig.Service.Debug,      // 开发模式
+		Encoding:          LocalConfig.Logger.Encode,      // 日志格式json/console
 		EncoderConfig:     encoderConfig,                  // 编码器配置
 		OutputPaths:       outputs,                        // 输出路径
 		DisableStacktrace: true,                           // 屏蔽堆栈跟踪

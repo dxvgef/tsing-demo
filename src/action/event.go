@@ -18,7 +18,7 @@ func EventHandler(event *tsing.Event) {
 	// 根据状态码做不同的日志处理
 	switch event.Status {
 	case 404:
-		if global.Config.Service.NotFoundEvent == true {
+		if global.LocalConfig.Service.NotFoundEvent == true {
 			global.Logger.Default.Error(
 				event.Message.Error(),
 				zap.Int("status", event.Status),
@@ -27,7 +27,7 @@ func EventHandler(event *tsing.Event) {
 			)
 		}
 	case 405:
-		if global.Config.Service.MethodNotAllowedEvent == true {
+		if global.LocalConfig.Service.MethodNotAllowedEvent == true {
 			global.Logger.Default.Warn(
 				event.Message.Error(),
 				zap.Int("status", event.Status),
@@ -41,13 +41,13 @@ func EventHandler(event *tsing.Event) {
 		fields = append(fields, zap.String("file", event.Trigger.File))
 		fields = append(fields, zap.Int("line", event.Trigger.Line))
 		fields = append(fields, zap.String("func", event.Trigger.Func))
-		if global.Config.Service.EventTrigger == true {
+		if global.LocalConfig.Service.EventTrigger == true {
 			fields = append(fields, zap.String("file", event.Trigger.File))
 			fields = append(fields, zap.Int("line", event.Trigger.Line))
 			fields = append(fields, zap.String("func", event.Trigger.Func))
 		}
 
-		if global.Config.Service.EventTrace == true {
+		if global.LocalConfig.Service.EventTrace == true {
 			var trace []string
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
@@ -58,7 +58,7 @@ func EventHandler(event *tsing.Event) {
 		global.Logger.Default.Error(event.Message.Error(), fields...)
 	}
 
-	if global.Config.Service.Debug == true {
+	if global.LocalConfig.Service.Debug == true {
 		if _, err := event.ResponseWriter.Write([]byte(event.Message.Error())); err != nil {
 			global.Logger.Default.Error(err.Error())
 		}
