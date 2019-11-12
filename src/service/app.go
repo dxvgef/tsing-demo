@@ -61,7 +61,7 @@ func Start() {
 	}()
 
 	// 退出进程时等待
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	// 指定退出超时时间
