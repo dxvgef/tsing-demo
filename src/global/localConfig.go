@@ -77,7 +77,7 @@ var LocalConfig struct {
 // 加载TOML配置文件
 func LoadTOMLConfig() error {
 	if LocalConfigPath == "" {
-		LocalConfigPath = *flag.String("c", "./config.toml", "配置文件路径")
+		flag.StringVar(&LocalConfigPath, "c", "./config.toml", "配置文件路径")
 		flag.Parse()
 	}
 
@@ -93,7 +93,7 @@ func LoadTOMLConfig() error {
 // 加载YAML配置文件
 func LoadYAMLConfig() error {
 	if LocalConfigPath == "" {
-		LocalConfigPath = *flag.String("c", "./config.yaml", "配置文件路径")
+		flag.StringVar(&LocalConfigPath, "c", "./config.yaml", "配置文件路径")
 		flag.Parse()
 	}
 	file, err := os.Open(filepath.Clean(LocalConfigPath))

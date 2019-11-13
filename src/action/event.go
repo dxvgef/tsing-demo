@@ -36,15 +36,19 @@ func EventHandler(event *tsing.Event) {
 			)
 		}
 	case 500:
-		var fields []zapcore.Field
-		fields = append(fields, zap.Int("status", event.Status))
-		fields = append(fields, zap.String("file", event.Trigger.File))
-		fields = append(fields, zap.Int("line", event.Trigger.Line))
-		fields = append(fields, zap.String("func", event.Trigger.Func))
+		fields := []zapcore.Field{
+			zap.Int("status", event.Status),
+			zap.String("file", event.Trigger.File),
+			zap.Int("line", event.Trigger.Line),
+			zap.String("func", event.Trigger.Func),
+		}
 		if global.LocalConfig.Service.EventTrigger {
-			fields = append(fields, zap.String("file", event.Trigger.File))
-			fields = append(fields, zap.Int("line", event.Trigger.Line))
-			fields = append(fields, zap.String("func", event.Trigger.Func))
+			fields = append(
+				fields,
+				zap.String("file", event.Trigger.File),
+				zap.Int("line", event.Trigger.Line),
+				zap.String("func", event.Trigger.Func),
+			)
 		}
 
 		if global.LocalConfig.Service.EventTrace {
