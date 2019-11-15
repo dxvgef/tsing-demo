@@ -6,13 +6,13 @@ import (
 	"github.com/dxvgef/sessions"
 )
 
-// session管理器
-var Session sessions.Manager
+// session引擎
+var Session *sessions.Engine
 
-// SetSessions 设置session Manager
+// SetSessions 设置session引擎
 func SetSessions() (err error) {
 	// 创建session管理器
-	Session, err = sessions.NewManager(sessions.Config{
+	Session, err = sessions.NewEngine(&sessions.Config{
 		CookieName:                LocalConfig.Session.CookieName,                            // cookie中的sessionID名称
 		HttpOnly:                  LocalConfig.Session.HTTPOnly,                              // 仅允许HTTP读取，js无法读取
 		Domain:                    "",                                                        // 作用域名，留空则自动获取当前域名

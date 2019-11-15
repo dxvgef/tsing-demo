@@ -53,16 +53,16 @@ func main() {
 	}
 
 	// 设置etcd client
-	if err = global.SetETCDClient(); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
-		return
-	}
+	// if err = global.SetETCDClient(); err != nil {
+	// 	global.Logger.Caller.Fatal(err.Error())
+	// 	return
+	// }
 
 	// 从etcd加载远程配置
-	if err = global.LoadRemoteConfigFromETCD(); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
-		return
-	}
+	// if err = global.LoadRemoteConfigFromETCD(); err != nil {
+	// 	global.Logger.Caller.Fatal(err.Error())
+	// 	return
+	// }
 
 	// 启动服务
 	service.Start()

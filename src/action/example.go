@@ -47,7 +47,7 @@ func (*Example) Session(ctx *tsing.Context) error {
 	if err = session.Set("test", "tsing"); err != nil {
 		return err
 	}
-
+	session.Get("test")
 	sessValue, err := session.Get("test").String()
 	if err != nil {
 		return err

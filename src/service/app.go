@@ -26,6 +26,8 @@ func Config() {
 	app.Config.RedirectTrailingSlash = global.LocalConfig.Service.RedirectTrailingSlash
 	app.Config.EventHandler = action.EventHandler
 
+	// 禁用panic处理器，提升性能
+
 	// 设置路由
 	setRouter()
 
