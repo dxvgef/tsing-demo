@@ -38,9 +38,6 @@ func EventHandler(event *tsing.Event) {
 	case 500:
 		fields := []zapcore.Field{
 			zap.Int("status", event.Status),
-			zap.String("file", event.Trigger.File),
-			zap.Int("line", event.Trigger.Line),
-			zap.String("func", event.Trigger.Func),
 		}
 		if global.LocalConfig.Service.EventTrigger {
 			fields = append(
