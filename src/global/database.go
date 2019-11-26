@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg"
+	"go.uber.org/zap"
 )
 
 var DB *pg.DB
@@ -25,9 +26,9 @@ func (QueryHook) AfterQuery(qe *pg.QueryEvent) {
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		Logger.Caller.Warn(err.Error())
+		Logger.Caller.WithOptions(zap.AddCallerSkip(10)).Error(err.Error())
 	}
-	Logger.Default.Debug(stmt)
+	Logger.Caller.WithOptions(zap.AddCallerSkip(10)).Debug(stmt)
 }
 
 // SetDatabase 设置数据库
