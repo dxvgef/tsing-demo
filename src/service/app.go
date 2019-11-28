@@ -18,15 +18,24 @@ var app *tsing.App
 var appServer *http.Server
 
 func Config() {
-	app = tsing.New()
-	app.Config.HandleOPTIONS = global.LocalConfig.Service.HandleOPTIONS
-	app.Config.FixPath = global.LocalConfig.Service.FixPath
-	app.Config.EventTrace = global.LocalConfig.Service.EventTrace
-	app.Config.EventTrigger = global.LocalConfig.Service.EventTrigger
-	app.Config.RedirectTrailingSlash = global.LocalConfig.Service.RedirectTrailingSlash
-	app.Config.EventHandler = action.EventHandler
+	var config tsing.Config
+	config.HandleOPTIONS = global.LocalConfig.Service.HandleOPTIONS
+	config.Recover = global.LocalConfig.Service.Recover
+	config.EventHandler = action.EventHandler
+	config.ShortPath = global.LocalConfig.Service.ShortPath
+	config.Trigger = global.LocalConfig.Service.Trigger
+	config.Trace = global.LocalConfig.Service.Trace
+	config.ErrorEvent = global.LocalConfig.Service.ErrorEvent
+	config.NotFoundEvent = global.LocalConfig.Service.NotFoundEvent
+	config.MethodNotAllowedEvent = global.LocalConfig.Service.MethodNotAllowedEvent
+	config.RedirectTrailingSlash = global.LocalConfig.Service.RedirectTrailingSlash
+	config.FixPath = global.LocalConfig.Service.FixPath
+	rootPath, err := os.Getwd()
+	if err == nil {
+		config.RootPath = rootPath
+	}
 
-	// 禁用panic处理器，提升性能
+	app = tsing.New(&config)
 
 	// 设置路由
 	setRouter()

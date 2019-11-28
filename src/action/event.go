@@ -39,7 +39,7 @@ func EventHandler(event *tsing.Event) {
 		fields := []zapcore.Field{
 			zap.Int("status", event.Status),
 		}
-		if global.LocalConfig.Service.EventTrigger {
+		if global.LocalConfig.Service.Trigger {
 			fields = append(
 				fields,
 				zap.String("file", event.Trigger.File),
@@ -48,7 +48,7 @@ func EventHandler(event *tsing.Event) {
 			)
 		}
 
-		if global.LocalConfig.Service.EventTrace {
+		if global.LocalConfig.Service.Trace {
 			var trace []string
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
