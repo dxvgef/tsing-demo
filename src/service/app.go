@@ -19,17 +19,17 @@ var appServer *http.Server
 
 func Config() {
 	var config tsing.Config
+	config.EventHandler = action.EventHandler
+	config.RedirectTrailingSlash = global.LocalConfig.Service.RedirectTrailingSlash
+	config.FixPath = global.LocalConfig.Service.FixPath
 	config.HandleOPTIONS = global.LocalConfig.Service.HandleOPTIONS
 	config.Recover = global.LocalConfig.Service.Recover
-	config.EventHandler = action.EventHandler
 	config.ShortPath = global.LocalConfig.Service.ShortPath
 	config.Trigger = global.LocalConfig.Service.Trigger
 	config.Trace = global.LocalConfig.Service.Trace
 	config.ErrorEvent = global.LocalConfig.Service.ErrorEvent
 	config.NotFoundEvent = global.LocalConfig.Service.NotFoundEvent
 	config.MethodNotAllowedEvent = global.LocalConfig.Service.MethodNotAllowedEvent
-	config.RedirectTrailingSlash = global.LocalConfig.Service.RedirectTrailingSlash
-	config.FixPath = global.LocalConfig.Service.FixPath
 	rootPath, err := os.Getwd()
 	if err == nil {
 		config.RootPath = rootPath
