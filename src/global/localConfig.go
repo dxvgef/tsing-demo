@@ -53,6 +53,7 @@ var LocalConfig struct {
 		Password     string `yaml:"password" toml:"password"`
 		Name         string `yaml:"name" toml:"name"`
 		StmtLog      bool   `yaml:"stmtLog" toml:"stmtLog"`
+		DialTimeout  int    `yaml:"dialTimeout" toml:"dialTimeout"`
 		ReadTimeout  int    `yaml:"readTimeout" toml:"readTimeout"`
 		WriteTimeout int    `yaml:"writeTimeout" toml:"writeTimeout"`
 		PoolSize     int    `yaml:"poolSize" toml:"poolSize"`
