@@ -1,10 +1,12 @@
 package global
 
 import (
+	"context"
 	"errors"
+	"strings"
 	"time"
 
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v9"
 	"go.uber.org/zap"
 )
 
@@ -14,21 +16,37 @@ var DB *pg.DB
 type QueryHook struct{}
 
 // BeforeQuery 查询前钩子
-func (QueryHook) BeforeQuery(qe *pg.QueryEvent) {
+func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Context, error) {
 	// 连接数据库
 	if err := SetDatabase(); err != nil {
 		Logger.Caller.Error(err.Error())
 	}
+	return ctx, nil
 }
 
 // AfterQuery 查询后钩子
-func (QueryHook) AfterQuery(qe *pg.QueryEvent) {
+func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		Logger.Caller.WithOptions(zap.AddCallerSkip(10)).Error(err.Error())
+		Logger.Caller.WithOptions(zap.AddCallerSkip(1)).Error(err.Error())
 	}
-	Logger.Caller.WithOptions(zap.AddCallerSkip(10)).Debug(stmt)
+
+	skip := 5
+	// nolint:gocritic
+	if stmt == "BEGIN" {
+		skip = 6
+	} else if strings.HasPrefix(stmt, "UPDATE") {
+		skip = 7
+	} else if strings.HasPrefix(stmt, "INSERT") {
+		skip = 6
+	} else if strings.HasPrefix(stmt, "DELETE") {
+		skip = 7
+	}
+
+	Logger.Caller.WithOptions(zap.AddCallerSkip(skip)).Debug(stmt)
+
+	return nil
 }
 
 // SetDatabase 设置数据库
@@ -54,12 +72,13 @@ func SetDatabase() error {
 		User:         LocalConfig.Database.User,
 		Password:     LocalConfig.Database.Password,
 		Database:     LocalConfig.Database.Name,
+		DialTimeout:  time.Duration(LocalConfig.Database.DialTimeout) * time.Second,
 		ReadTimeout:  time.Duration(LocalConfig.Database.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(LocalConfig.Database.WriteTimeout) * time.Second,
 		PoolSize:     LocalConfig.Database.PoolSize,
 	})
 
-	// 启用查询日志，将记录SQL语句
+	// 注册查询钩子
 	if LocalConfig.Database.StmtLog {
 		DB.AddQueryHook(QueryHook{})
 	}
