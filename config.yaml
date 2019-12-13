@@ -69,7 +69,7 @@ database:
   # 记录SQL语句
   stmtLog: true
   # 连接超时(秒)
-  dialTimeout
+  dialTimeout: 5
   # 读超时(秒)
   readTimeout: 10
   # 写超时(秒)
