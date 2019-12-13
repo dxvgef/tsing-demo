@@ -44,16 +44,16 @@ func EventHandler(event *tsing.Event) {
 			e.Strs("trace", trace)
 		}
 
-		e.Err(event.Message)
+		e.Msg(event.Message.Error())
 	}
 
 	if global.LocalConfig.Service.Debug {
 		if _, err := event.ResponseWriter.Write([]byte(event.Message.Error())); err != nil {
-			log.Err(err)
+			log.Error().Msg(err.Error())
 		}
 	} else {
 		if _, err := event.ResponseWriter.Write([]byte(http.StatusText(event.Status))); err != nil {
-			log.Err(err)
+			log.Error().Msg(err.Error())
 		}
 	}
 }

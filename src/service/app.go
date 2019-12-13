@@ -8,12 +8,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dxvgef/tsing"
 	"github.com/rs/zerolog/log"
 
 	"local/action"
 	"local/global"
-
-	"github.com/dxvgef/tsing"
 )
 
 var app *tsing.App
@@ -34,7 +33,7 @@ func Config() {
 	config.MethodNotAllowedEvent = global.LocalConfig.Service.MethodNotAllowedEvent
 	rootPath, err := os.Getwd()
 	if err == nil {
-		config.RootPath = rootPath
+		config.RootPath = rootPath + "/src/"
 	}
 
 	app = tsing.New(&config)
@@ -68,7 +67,7 @@ func Start() {
 			if err == http.ErrServerClosed {
 				log.Info().Msg("服务已退出")
 			} else {
-				log.Fatal().Err(err)
+				log.Fatal().Msg(err.Error())
 			}
 		}
 	}()
@@ -81,6 +80,6 @@ func Start() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.LocalConfig.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if err := appServer.Shutdown(ctx); err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 }

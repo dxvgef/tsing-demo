@@ -19,7 +19,7 @@ type QueryHook struct{}
 func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Context, error) {
 	// 连接数据库
 	if err := SetDatabase(); err != nil {
-		log.Error().Err(err)
+		log.Error().Msg(err.Error())
 	}
 	return ctx, nil
 }
@@ -29,7 +29,7 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		log.Error().Caller(1).Err(err)
+		log.Error().Caller(1).Msg(err.Error())
 	}
 
 	skip := 5

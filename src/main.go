@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	stdLog "log"
 
 	"github.com/rs/zerolog/log"
@@ -38,23 +37,21 @@ func main() {
 		return
 	}
 
-	log.Fatal().Err(errors.New("测试一下"))
-
 	// 设置ID节点
 	if err = global.SetIDnode(); err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Msg(err.Error())
 		return
 	}
 
 	// 设置数据库
 	if err = global.SetDatabase(); err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Msg(err.Error())
 		return
 	}
 
 	// 设置Session
 	if err = global.SetSessions(); err != nil {
-		log.Fatal().Err(err)
+		log.Fatal().Msg(err.Error())
 		return
 	}
 
