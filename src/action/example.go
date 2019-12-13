@@ -68,7 +68,7 @@ func (*Example) Admin(ctx *tsing.Context) error {
 		filter.El(&reqData.username, filter.FromString(ctx.QueryValue("username"), "账号").
 			RemoveSpace().MinLength(3).MaxLength(16)), // 要求最大长度
 		filter.El(&reqData.password, filter.FromString(ctx.QueryValue("password"), "密码").
-			MinLength(6).MaxLength(32).HasDigit().HasUpper().HasLower().HasSymbol(),
+			MinLength(6).MaxLength(32).MustHasDigit().MustHasUpper().MustHasLower().MustHasSymbol(),
 		),
 	)
 	if err != nil {
