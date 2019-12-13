@@ -38,10 +38,11 @@ var LocalConfig struct {
 		FixPath               bool   `yaml:"fixPath" toml:"fixPath"`
 	} `yaml:"service" toml:"service"`
 	Logger struct {
-		Level      string `yaml:"level" toml:"level"`
-		Outputs    string `yaml:"outputs" toml:"outputs"`
-		Encode     string `yaml:"encode" toml:"encode"`
-		ColorLevel bool   `yaml:"colorLevel" toml:"colorLevel"`
+		Level      string      `yaml:"level" toml:"level"`
+		FilePath   string      `yaml:"filePath" toml:"filePath"`
+		FileMode   os.FileMode `yaml:"fileMode" toml:"fileMode"`
+		Encode     string      `yaml:"encode" toml:"encode"`
+		TimeFormat string      `yaml:"timeFormat" toml:"timeFormat"`
 	} `yaml:"logger" toml:"logger"`
 	Snowflake struct {
 		Epoch int64 `yaml:"epoch" toml:"epoch"`

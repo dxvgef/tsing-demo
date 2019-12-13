@@ -5,12 +5,11 @@ import (
 
 	"github.com/dxvgef/tsing"
 	"github.com/gbrlsnchs/jwt/v3"
-
-	"local/global"
+	"github.com/rs/zerolog/log"
 )
 
 func CheckJWT(ctx *tsing.Context) error {
-	global.Logger.Caller.Debug("执行了CheckJWT中间件")
+	log.Debug().Caller().Msg("执行了CheckJWT中间件")
 	respData := makeRespMapData()
 	tokenStr, exist := ctx.Post("token")
 	if !exist {

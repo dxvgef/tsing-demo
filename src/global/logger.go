@@ -1,89 +1,94 @@
 package global
 
 import (
-	"log"
+	"errors"
+	"io"
+	"os"
 	"strings"
-	"time"
 
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
-
-var Logger struct {
-	Default  *zap.Logger // 默认logger，不带caller信息
-	Caller   *zap.Logger // 带caller信息的logger
-	StdError *log.Logger // 实现标准包log的logger，级别为error
-}
 
 // 设置logger
 func SetLogger() error {
-	var err error
-
+	// 设置级别
 	level := strings.ToLower(LocalConfig.Logger.Level)
-	// 设置日志记录级别
-	var zapLevel zapcore.Level
 	switch level {
 	case "info":
-		zapLevel = zapcore.InfoLevel
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	case "warn":
-		zapLevel = zapcore.WarnLevel
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
 	case "error":
-		zapLevel = zapcore.ErrorLevel
-	case "dpanic":
-		zapLevel = zapcore.DPanicLevel
-	case "panic":
-		zapLevel = zapcore.PanicLevel
-	case "fatal":
-		zapLevel = zapcore.FatalLevel
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case "empty":
+		zerolog.SetGlobalLevel(zerolog.NoLevel)
+	case "debug":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	default:
-		zapLevel = zapcore.DebugLevel
+		zerolog.SetGlobalLevel(zerolog.Disabled)
+		return nil
 	}
 
-	// 配置级别编码器
-	var encodeLevel zapcore.LevelEncoder
-	if LocalConfig.Logger.ColorLevel && LocalConfig.Logger.Encode == "console" {
-		encodeLevel = zapcore.CapitalColorLevelEncoder
+	// 设置时间格式
+	if LocalConfig.Logger.TimeFormat == "timestamp" {
+		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	} else {
-		encodeLevel = zapcore.CapitalLevelEncoder
+		zerolog.TimeFieldFormat = timeFormater(LocalConfig.Logger.TimeFormat)
 	}
 
-	outputs := strings.Split(LocalConfig.Logger.Outputs, "|")
-
-	// 配置编码器的参数
-	encoderConfig := zapcore.EncoderConfig{
-		MessageKey: "message", // 消息字段名
-		LevelKey:   "level",   // 级别字段名
-		TimeKey:    "time",    // 时间字段名
-		CallerKey:  "file",    // 记录源码文件的字段名
-		// 编码时间字符串的格式
-		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-			enc.AppendString(t.Format("2006-01-02 15:04:05"))
-		},
-		EncodeLevel:  encodeLevel,                // 日志级别的编码器
-		EncodeCaller: zapcore.ShortCallerEncoder, // Caller的编码器
+	// 设置日志输出方式
+	var output io.Writer
+	var logFile *os.File
+	var err error
+	// 设置日志文件
+	if LocalConfig.Logger.FilePath != "" {
+		// 输出到文件
+		if LocalConfig.Logger.FileMode == 0 {
+			LocalConfig.Logger.FileMode = os.FileMode(0600)
+		}
+		logFile, err = os.OpenFile(LocalConfig.Logger.FilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, LocalConfig.Logger.FileMode)
+		if nil != err {
+			return err
+		}
+	}
+	switch LocalConfig.Logger.Encode {
+	// console编码
+	case "console":
+		if logFile != nil {
+			output = zerolog.ConsoleWriter{
+				Out:        logFile,
+				NoColor:    true,
+				TimeFormat: zerolog.TimeFieldFormat,
+			}
+		} else {
+			output = zerolog.ConsoleWriter{
+				Out:        os.Stdout,
+				TimeFormat: zerolog.TimeFieldFormat,
+			}
+		}
+	// json编码
+	case "json":
+		if logFile != nil {
+			output = logFile
+		} else {
+			output = os.Stdout
+		}
+	default:
+		return errors.New("从配置文件的logger.encode中获得了未知的参数，目前只支持json|console")
 	}
 
-	// 设置Logger
-	Logger.Default, err = zap.Config{
-		Level:             zap.NewAtomicLevelAt(zapLevel), // 日志记录级别
-		Development:       LocalConfig.Service.Debug,      // 开发模式
-		Encoding:          LocalConfig.Logger.Encode,      // 日志格式json/console
-		EncoderConfig:     encoderConfig,                  // 编码器配置
-		OutputPaths:       outputs,                        // 输出路径
-		DisableStacktrace: true,                           // 屏蔽堆栈跟踪
-		DisableCaller:     true,                           // 屏蔽调用信息
-	}.Build()
-	if err != nil {
-		return err
-	}
+	log.Logger = log.Output(output)
 
-	// 将Logger转为log.Logger，级别为error
-	Logger.StdError, err = zap.NewStdLogAt(Logger.Default, zap.ErrorLevel)
-	if err != nil {
-		return err
-	}
+	return nil
+}
 
-	// 带caller的logger
-	Logger.Caller = Logger.Default.WithOptions(zap.AddCaller())
-	return err
+func timeFormater(str string) string {
+	str = strings.Replace(str, "y", "2006", -1)
+	str = strings.Replace(str, "m", "01", -1)
+	str = strings.Replace(str, "d", "02", -1)
+	str = strings.Replace(str, "h", "15", -1)
+	str = strings.Replace(str, "i", "04", -1)
+	str = strings.Replace(str, "s", "05", -1)
+	return str
 }

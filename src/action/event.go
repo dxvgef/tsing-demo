@@ -2,10 +2,10 @@ package action
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/dxvgef/tsing"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	"github.com/rs/zerolog/log"
 
 	"local/global"
 )
@@ -19,33 +19,21 @@ func EventHandler(event *tsing.Event) {
 	switch event.Status {
 	case 404:
 		if global.LocalConfig.Service.NotFoundEvent {
-			global.Logger.Default.Error(
-				event.Message.Error(),
-				zap.Int("status", event.Status),
-				zap.String("method", event.Request.Method),
-				zap.String("uri", event.Request.RequestURI),
-			)
+			log.Error().Int("status", event.Status).
+				Str("method", event.Request.Method).
+				Str("uri", event.Request.RequestURI).Msg(http.StatusText(404))
 		}
 	case 405:
 		if global.LocalConfig.Service.MethodNotAllowedEvent {
-			global.Logger.Default.Warn(
-				event.Message.Error(),
-				zap.Int("status", event.Status),
-				zap.String("method", event.Request.Method),
-				zap.String("uri", event.Request.RequestURI),
-			)
+			log.Error().Int("status", event.Status).
+				Str("method", event.Request.Method).
+				Str("uri", event.Request.RequestURI).Msg(http.StatusText(405))
 		}
 	case 500:
-		fields := []zapcore.Field{
-			zap.Int("status", event.Status),
-		}
+		e := log.Error()
 		if global.LocalConfig.Service.Trigger {
-			fields = append(
-				fields,
-				zap.String("file", event.Trigger.File),
-				zap.Int("line", event.Trigger.Line),
-				zap.String("func", event.Trigger.Func),
-			)
+			e.Str("caller", " "+event.Trigger.File+":"+strconv.Itoa(event.Trigger.Line)+" ").
+				Str("func", event.Trigger.Func)
 		}
 
 		if global.LocalConfig.Service.Trace {
@@ -53,19 +41,19 @@ func EventHandler(event *tsing.Event) {
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
 			}
-			fields = append(fields, zap.Strings("trace", trace))
+			e.Strs("trace", trace)
 		}
 
-		global.Logger.Default.Error(event.Message.Error(), fields...)
+		e.Err(event.Message)
 	}
 
 	if global.LocalConfig.Service.Debug {
 		if _, err := event.ResponseWriter.Write([]byte(event.Message.Error())); err != nil {
-			global.Logger.Default.Error(err.Error())
+			log.Err(err)
 		}
 	} else {
 		if _, err := event.ResponseWriter.Write([]byte(http.StatusText(event.Status))); err != nil {
-			global.Logger.Default.Error(err.Error())
+			log.Err(err)
 		}
 	}
 }

@@ -40,14 +40,28 @@ fixPath = true
 
 # 日志记录器
 [logger]
-# 记录级别
+# 记录级别，支持以下值，留空则禁用logger
+# empty   不显示级别
+# debug
+# info
+# warn
+# error
 level = "debug"
-# 日志输出方式，用|符号分隔多个
-outputs = "stderr"
+# 日志文件的路径，如果留空则不写文件
+filePath = ""
+# 日志文件的权限，例如0755|0700|0600
+fileMode = 0600
 # 日志输出编码，支持json,console
-encode = "console"
-# 彩色显示level
-colorLevel = true
+encode = "json"
+# 时间格式，支持以下值
+# y 年
+# m 月
+# d 日
+# h 时
+# i 分
+# s 秒
+# timestamp unix时间戳
+timeFormat = "y-m-d h:i:s"
 
 # snowflake算法参数
 [snowflake]

@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"local/action"
 	"local/global"
 
@@ -47,9 +49,9 @@ func Config() {
 
 	// 定义HTTP服务
 	appServer = &http.Server{
-		Addr:              global.LocalConfig.Service.IP + ":" + strconv.Itoa(global.LocalConfig.Service.Port),
-		Handler:           app,                                                                       // 调度器
-		ErrorLog:          global.Logger.StdError,                                                    // 日志记录器
+		Addr:    global.LocalConfig.Service.IP + ":" + strconv.Itoa(global.LocalConfig.Service.Port),
+		Handler: app, // 调度器
+		// ErrorLog:          global.Logger.StdError,                                                    // 日志记录器
 		ReadTimeout:       time.Duration(global.LocalConfig.Service.ReadTimeout) * time.Second,       // 读取超时
 		WriteTimeout:      time.Duration(global.LocalConfig.Service.WriteTimeout) * time.Second,      // 响应超时
 		IdleTimeout:       time.Duration(global.LocalConfig.Service.IdleTimeout) * time.Second,       // 连接空闲超时
@@ -61,12 +63,12 @@ func Start() {
 	Config()
 	// 在新协程中启动服务，方便实现退出等待
 	go func() {
-		global.Logger.Default.Info("HTTP服务 " + appServer.Addr + " 启动成功")
+		log.Info().Msg("HTTP服务 " + appServer.Addr + " 启动成功")
 		if err := appServer.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				global.Logger.Default.Info("服务已退出")
+				log.Info().Msg("服务已退出")
 			} else {
-				global.Logger.Caller.Fatal(err.Error())
+				log.Fatal().Err(err)
 			}
 		}
 	}()
@@ -79,6 +81,6 @@ func Start() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.LocalConfig.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if err := appServer.Shutdown(ctx); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
+		log.Fatal().Err(err)
 	}
 }

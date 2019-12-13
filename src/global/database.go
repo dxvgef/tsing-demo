@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-pg/pg/v9"
-	"go.uber.org/zap"
+	"github.com/rs/zerolog/log"
 )
 
 var DB *pg.DB
@@ -19,7 +19,7 @@ type QueryHook struct{}
 func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Context, error) {
 	// 连接数据库
 	if err := SetDatabase(); err != nil {
-		Logger.Caller.Error(err.Error())
+		log.Error().Err(err)
 	}
 	return ctx, nil
 }
@@ -29,7 +29,7 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		Logger.Caller.WithOptions(zap.AddCallerSkip(1)).Error(err.Error())
+		log.Error().Caller(1).Err(err)
 	}
 
 	skip := 5
@@ -44,7 +44,7 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 		skip = 7
 	}
 
-	Logger.Caller.WithOptions(zap.AddCallerSkip(skip)).Debug(stmt)
+	log.Debug().Caller(skip).Msg(stmt)
 
 	return nil
 }

@@ -11,7 +11,6 @@ var ETCDClient client.KeysAPI
 
 // 设置ETCD Client
 func SetETCDClient() error {
-	Logger.Default.Sugar().Debug(LocalConfig.ETCD.Endpoints)
 	config, err := client.New(client.Config{
 		Endpoints:               LocalConfig.ETCD.Endpoints,
 		Transport:               client.DefaultTransport,

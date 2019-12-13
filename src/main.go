@@ -1,16 +1,20 @@
 package main
 
 import (
-	"log"
+	"errors"
+	stdLog "log"
+
+	"github.com/rs/zerolog/log"
 
 	"local/global"
 	"local/service"
 )
 
 func main() {
-	log.SetFlags(log.Lshortfile)
+	stdLog.SetFlags(stdLog.Lshortfile)
 
 	var err error
+
 	// 加载TOML配置文件
 	// if err = global.LoadTOMLConfig(); err != nil {
 	// 	log.Fatal(err.Error())
@@ -18,37 +22,39 @@ func main() {
 	// }
 	// 加载YAML配置文件
 	if err = global.LoadYAMLConfig(); err != nil {
-		log.Fatal(err.Error())
+		stdLog.Fatal(err.Error())
 		return
 	}
 
 	// 监视并热更新配置
-	if err = global.WatchConfig(); err != nil {
-		log.Fatal(err.Error())
-		return
-	}
+	// if err = global.WatchConfig(); err != nil {
+	// 	stdLog.Fatal(err.Error())
+	// 	return
+	// }
 
 	// 设置日志记录器
 	if err = global.SetLogger(); err != nil {
-		log.Fatal(err.Error())
+		stdLog.Fatal(err.Error())
 		return
 	}
 
+	log.Fatal().Err(errors.New("测试一下"))
+
 	// 设置ID节点
 	if err = global.SetIDnode(); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
+		log.Fatal().Err(err)
 		return
 	}
 
 	// 设置数据库
 	if err = global.SetDatabase(); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
+		log.Fatal().Err(err)
 		return
 	}
 
 	// 设置Session
 	if err = global.SetSessions(); err != nil {
-		global.Logger.Caller.Fatal(err.Error())
+		log.Fatal().Err(err)
 		return
 	}
 
