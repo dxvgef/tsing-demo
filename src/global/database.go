@@ -3,7 +3,6 @@ package global
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/go-pg/pg/v9"
@@ -26,25 +25,16 @@ func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Co
 
 // AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
+	if !LocalConfig.Database.StmtLog {
+		return nil
+	}
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		log.Error().Caller(1).Msg(err.Error())
+		log.Error().Msg(err.Error())
 	}
 
-	skip := 5
-	// nolint:gocritic
-	if stmt == "BEGIN" {
-		skip = 6
-	} else if strings.HasPrefix(stmt, "UPDATE") {
-		skip = 7
-	} else if strings.HasPrefix(stmt, "INSERT") {
-		skip = 6
-	} else if strings.HasPrefix(stmt, "DELETE") {
-		skip = 7
-	}
-
-	log.Debug().Caller(skip).Msg(stmt)
+	log.Debug().Msg(stmt)
 
 	return nil
 }
@@ -79,9 +69,7 @@ func SetDatabase() error {
 	})
 
 	// 注册查询钩子
-	if LocalConfig.Database.StmtLog {
-		DB.AddQueryHook(QueryHook{})
-	}
+	DB.AddQueryHook(QueryHook{})
 
 	return nil
 }
