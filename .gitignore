@@ -5,3 +5,5 @@ bin/
 *.iml
 *.log
 *.sum
+.history/
+.vscode/
