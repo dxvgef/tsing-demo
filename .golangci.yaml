@@ -82,10 +82,10 @@ linters:
     - govet
     - maligned
     - prealloc
-    - unused
     - typecheck
   enable-all: false
   disable:
+    - unused
   disable-all: false
   presets:
     - bugs
