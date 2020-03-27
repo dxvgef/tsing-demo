@@ -16,27 +16,22 @@ service:
   quitWaitTimeout: 5
   # 调试模式，会将详细的错误信息输出给客户端
   debug: true
-  # 记录触发信息(影响性能)
-  trigger: true
-  # 记录跟踪信息(影响性能)
-  trace: true
-  # 记录处理器返回的error事件
-  errorEvent: true
-  # 记录404错误
-  notFoundEvent: true
-  # 记录405错误
-  methodNotAllowedEvent: true
-  # 自动处理HTTP OPTIONS方法请求(响应200状态码)
-  handleOPTIONS: true
-  # 重定向到类似的路由
-  # 例如/abc/如果没有匹配到路由，但存在/abc路由，则自动重写向到后者
-  redirectTrailingSlash: false
   # 自动恢复panic
   recover: true
+  # 记录事件来源信息(影响性能)
+  eventSource: true
+  # 记录跟踪信息(影响性能)
+  eventTrace: true
+  # 记录处理器返回的error事件
+  eventHandlerError: true
+  # 记录404错误
+  eventNotFound: true
+  # 记录405错误
+  eventMethodNotAllowed: true
   # 事件中使用短路径
-  shortPath: true
-  # 修复URL中的路径
-  fixPath: true
+  eventShortPath: true
+  # 自动处理HTTP OPTIONS方法请求(响应200状态码)
+  handleOPTIONS: true
 
 # 日志记录器
 logger:

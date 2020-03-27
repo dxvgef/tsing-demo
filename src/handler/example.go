@@ -1,4 +1,4 @@
-package action
+package handler
 
 import (
 	"time"
@@ -20,7 +20,7 @@ type AccessToken struct {
 
 type Example struct{}
 
-func (*Example) SignJWT(ctx *tsing.Context) error {
+func (*Example) SignToken(ctx *tsing.Context) error {
 	var respData RespData
 	var accessToken AccessToken
 	accessToken.Data.ID = 123

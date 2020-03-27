@@ -1,18 +1,18 @@
 package service
 
 import (
-	"local/action"
+	"local/handler"
 )
 
 // 设置路由
 func setRouter() {
 
-	handler := new(action.Example)
+	example := new(handler.Example)
 
-	app.Router.GET("/sign", handler.SignJWT)
-	app.Router.GET("/session", handler.Session)
-	{
-		adminRouter := app.Router.GROUP("/admin", action.CheckJWT)
-		adminRouter.GET("", handler.Admin)
-	}
+	app.Router.GET("/login", example.SignToken)
+	// app.Router.GET("/session", example.Session)
+
+	adminRouter := app.Group("/", handler.CheckToken)
+	adminRouter.GET("", example.Admin)
+
 }

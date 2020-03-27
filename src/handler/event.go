@@ -1,4 +1,4 @@
-package action
+package handler
 
 import (
 	"net/http"
@@ -18,25 +18,25 @@ func EventHandler(event *tsing.Event) {
 	// 根据状态码做不同的日志处理
 	switch event.Status {
 	case 404:
-		if global.LocalConfig.Service.NotFoundEvent {
+		if global.LocalConfig.Service.EventNotFound {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(404))
 		}
 	case 405:
-		if global.LocalConfig.Service.MethodNotAllowedEvent {
+		if global.LocalConfig.Service.EventMethodNotAllowed {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(405))
 		}
 	case 500:
 		e := log.Error()
-		if global.LocalConfig.Service.Trigger {
-			e.Str("caller", " "+event.Trigger.File+":"+strconv.Itoa(event.Trigger.Line)+" ").
-				Str("func", event.Trigger.Func)
+		if global.LocalConfig.Service.EventSource {
+			e.Str("caller", " "+event.Source.File+":"+strconv.Itoa(event.Source.Line)+" ").
+				Str("func", event.Source.Func)
 		}
 
-		if global.LocalConfig.Service.Trace {
+		if global.LocalConfig.Service.EventTrace {
 			var trace []string
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
@@ -47,13 +47,13 @@ func EventHandler(event *tsing.Event) {
 		e.Msg(event.Message.Error())
 	}
 
+	responseMsg := ""
 	if global.LocalConfig.Service.Debug {
-		if _, err := event.ResponseWriter.Write([]byte(event.Message.Error())); err != nil {
-			log.Error().Msg(err.Error())
-		}
+		responseMsg = event.Message.Error()
 	} else {
-		if _, err := event.ResponseWriter.Write([]byte(http.StatusText(event.Status))); err != nil {
-			log.Error().Msg(err.Error())
-		}
+		responseMsg = http.StatusText(event.Status)
+	}
+	if _, err := event.ResponseWriter.Write([]byte(responseMsg)); err != nil {
+		log.Error().Msg(err.Error())
 	}
 }

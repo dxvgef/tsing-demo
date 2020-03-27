@@ -19,6 +19,7 @@ func main() {
 	// 	log.Fatal(err.Error())
 	// 	return
 	// }
+
 	// 加载YAML配置文件
 	if err = global.LoadYAMLConfig(); err != nil {
 		stdLog.Fatal(err.Error())
@@ -43,17 +44,17 @@ func main() {
 		return
 	}
 
-	// 设置数据库
-	if err = global.SetDatabase(); err != nil {
-		log.Fatal().Msg(err.Error())
-		return
-	}
-
-	// 设置Session
-	if err = global.SetSessions(); err != nil {
-		log.Fatal().Msg(err.Error())
-		return
-	}
+	// // 设置数据库
+	// if err = global.SetDatabase(); err != nil {
+	// 	log.Fatal().Msg(err.Error())
+	// 	return
+	// }
+	//
+	// // 设置Session
+	// if err = global.SetSessions(); err != nil {
+	// 	log.Fatal().Msg(err.Error())
+	// 	return
+	// }
 
 	// 设置etcd client
 	// if err = global.SetETCDClient(); err != nil {

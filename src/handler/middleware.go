@@ -1,4 +1,4 @@
-package action
+package handler
 
 import (
 	"time"
@@ -8,10 +8,10 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func CheckJWT(ctx *tsing.Context) error {
+func CheckToken(ctx *tsing.Context) error {
 	log.Debug().Caller().Msg("执行了CheckJWT中间件")
 	respData := makeRespMapData()
-	tokenStr, exist := ctx.Post("token")
+	tokenStr, exist := ctx.Query("token")
 	if !exist {
 		respData.Error = "token字段不存在"
 		return JSON(ctx, 401, respData)
@@ -30,9 +30,6 @@ func CheckJWT(ctx *tsing.Context) error {
 	}
 	respData.Data["id"] = accessToken.Data.ID
 	respData.Data["username"] = accessToken.Data.Username
-
-	// 执行后面的处理器
-	ctx.Next()
 
 	return nil
 }

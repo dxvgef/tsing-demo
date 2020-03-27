@@ -26,16 +26,14 @@ var LocalConfig struct {
 		IdleTimeout           int    `yaml:"idleTimeout" toml:"idleTimeout"`
 		QuitWaitTimeout       int    `yaml:"quitWaitTimeout" toml:"quitWaitTimeout"`
 		Debug                 bool   `yaml:"debug" toml:"debug"`
-		Trigger               bool   `yaml:"trigger" toml:"trigger"`
-		Trace                 bool   `yaml:"trace" toml:"trace"`
-		ErrorEvent            bool   `yaml:"errorEvent" toml:"errorEvent"`
-		NotFoundEvent         bool   `yaml:"notFoundEvent" toml:"notFoundEvent"`
-		MethodNotAllowedEvent bool   `yaml:"methodNotAllowedEvent" toml:"methodNotAllowedEvent"`
+		EventSource           bool   `yaml:"eventSource" toml:"eventSource"`
+		EventTrace            bool   `yaml:"eventTrace" toml:"eventTrace"`
+		EventHandlerError     bool   `yaml:"eventHandlerError" toml:"eventHandlerError"`
+		EventNotFound         bool   `yaml:"eventNotFound" toml:"eventNotFound"`
+		EventMethodNotAllowed bool   `yaml:"eventMethodNotAllowed" toml:"eventMethodNotAllowed"`
 		HandleOPTIONS         bool   `yaml:"handleOPTIONS" toml:"handleOPTIONS"`
-		RedirectTrailingSlash bool   `yaml:"redirectTrailingSlash" toml:"redirectTrailingSlash"`
 		Recover               bool   `yaml:"recover" toml:"recover"`
-		ShortPath             bool   `yaml:"shortPath" toml:"shortPath"`
-		FixPath               bool   `yaml:"fixPath" toml:"fixPath"`
+		EventShortPath        bool   `yaml:"eventShortPath" toml:"eventShortPath"`
 	} `yaml:"service" toml:"service"`
 	Logger struct {
 		Level      string      `yaml:"level" toml:"level"`
