@@ -51,5 +51,3 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 	sigs.k8s.io/yaml v1.1.0 // indirect
 )
-
-replace github.com/dxvgef/tsing => /Users/dxvgef/Projects/open/tsing

@@ -11,7 +11,7 @@ import (
 func CheckToken(ctx *tsing.Context) error {
 	log.Debug().Caller().Msg("执行了CheckJWT中间件")
 	respData := makeRespMapData()
-	tokenStr, exist := ctx.Query("token")
+	tokenStr, exist := ctx.QueryParam("token")
 	if !exist {
 		respData.Error = "token字段不存在"
 		return JSON(ctx, 401, respData)
