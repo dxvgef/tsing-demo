@@ -13,7 +13,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dxvgef/filter v1.4.0
 	github.com/dxvgef/sessions v0.4.6
-	github.com/dxvgef/tsing v1.1.0
+	github.com/dxvgef/tsing v1.1.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.1
 	github.com/go-pg/pg/v9 v9.1.5
