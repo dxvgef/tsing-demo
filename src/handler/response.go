@@ -33,7 +33,6 @@ func JSON(ctx *tsing.Context, status int, data interface{}) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	ctx.ResponseWriter.WriteHeader(status)
 	_, err = ctx.ResponseWriter.Write(dataBytes)
-	ctx.Abort()
 	return err
 }
 
@@ -43,13 +42,11 @@ func String(ctx *tsing.Context, status int, data string) error {
 	ctx.ResponseWriter.Header().Set("Content-Type", "text/plain; charset=UTF-8")
 	ctx.ResponseWriter.WriteHeader(status)
 	_, err := ctx.ResponseWriter.Write([]byte(data))
-	ctx.Abort()
 	return err
 }
 
 // 输出HTTP状态码，无返回数据
 func Status(ctx *tsing.Context, status int) error {
 	ctx.ResponseWriter.WriteHeader(status)
-	ctx.Abort()
 	return nil
 }

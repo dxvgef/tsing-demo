@@ -9,13 +9,20 @@ func setRouter() {
 
 	example := new(handler.Example)
 
-	app.GET("/login", example.SignToken)
+	// 注册一个静态目录路由
+	app.Dir("/dir/", "./")
+	// 注册一个静态文件路由
+	app.File("/config", "./config.yaml")
+
+	// 登录，获得token
+	app.GET("/login", example.Login)
+
+	// 读写session的演示
 	// app.GET("/session", example.Session)
 
-	app.Dir("/dir/", "./")
-	app.File("/config.yaml", "./config.yaml")
-
-	adminRouter := app.Group("/", handler.CheckToken)
-	adminRouter.GET("", example.Admin)
+	// 注册一个根路径的路由组，并添加检查token的处理器
+	secretRouter := app.Group("/", handler.CheckToken)
+	// 组内的首页路由
+	secretRouter.GET("", example.Index)
 
 }

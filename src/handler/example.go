@@ -6,8 +6,6 @@ import (
 	"github.com/dxvgef/filter"
 	"github.com/dxvgef/tsing"
 	"github.com/gbrlsnchs/jwt/v3"
-
-	"local/global"
 )
 
 type AccessToken struct {
@@ -20,12 +18,13 @@ type AccessToken struct {
 
 type Example struct{}
 
-func (*Example) SignToken(ctx *tsing.Context) error {
+// 登录，签发token
+func (*Example) Login(ctx *tsing.Context) error {
 	var respData RespData
 	var accessToken AccessToken
 	accessToken.Data.ID = 123
 	accessToken.Data.Username = "dxvgef"
-	accessToken.ExpirationTime = jwt.NumericDate(time.Now().Add(time.Minute))
+	accessToken.ExpirationTime = jwt.NumericDate(time.Now().Add(5 * time.Minute))
 
 	alg := jwt.NewHS256([]byte("secret"))
 	token, err := jwt.Sign(accessToken, alg)
@@ -37,6 +36,8 @@ func (*Example) SignToken(ctx *tsing.Context) error {
 	return JSON(ctx, 200, respData)
 }
 
+/*
+// 读写session的处理器
 func (*Example) Session(ctx *tsing.Context) error {
 	var respData RespData
 
@@ -56,8 +57,9 @@ func (*Example) Session(ctx *tsing.Context) error {
 
 	return JSON(ctx, 200, respData)
 }
+*/
 
-func (*Example) Admin(ctx *tsing.Context) error {
+func (*Example) Index(ctx *tsing.Context) error {
 	var reqData struct {
 		username string
 		password string
@@ -74,5 +76,5 @@ func (*Example) Admin(ctx *tsing.Context) error {
 	if err != nil {
 		return err
 	}
-	return String(ctx, 200, "Hello Tsing")
+	return String(ctx, 200, "身份验证通过，欢迎使用Tsing")
 }
