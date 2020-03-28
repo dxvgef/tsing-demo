@@ -61,10 +61,10 @@ func Start() {
 		log.Info().Msg("HTTP服务 " + appServer.Addr + " 启动成功")
 		if err := appServer.ListenAndServe(); err != nil {
 			if err == http.ErrServerClosed {
-				log.Info().Msg("服务已退出")
-			} else {
-				log.Fatal().Msg(err.Error())
+				log.Info().Msg("服务已关闭")
+				return
 			}
+			log.Fatal().Msg(err.Error())
 		}
 	}()
 
@@ -72,10 +72,13 @@ func Start() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
+
 	// 指定退出超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.LocalConfig.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if err := appServer.Shutdown(ctx); err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Caller().Msg(err.Error())
 	}
+
+	log.Info().Msg("程序已退出")
 }
