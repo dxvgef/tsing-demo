@@ -9,8 +9,11 @@ func setRouter() {
 
 	example := new(handler.Example)
 
-	app.Router.GET("/login", example.SignToken)
-	// app.Router.GET("/session", example.Session)
+	app.GET("/login", example.SignToken)
+	// app.GET("/session", example.Session)
+
+	app.Dir("/dir/", "./")
+	app.File("/config.yaml", "./config.yaml")
 
 	adminRouter := app.Group("/", handler.CheckToken)
 	adminRouter.GET("", example.Admin)
