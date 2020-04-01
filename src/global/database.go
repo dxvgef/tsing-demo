@@ -69,7 +69,9 @@ func SetDatabase() error {
 	})
 
 	// 注册查询钩子
-	DB.AddQueryHook(QueryHook{})
+	if LocalConfig.Database.StmtLog {
+		DB.AddQueryHook(QueryHook{})
+	}
 
 	return nil
 }
