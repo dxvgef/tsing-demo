@@ -1,7 +1,8 @@
 .idea
 .history
 .vscode
-bin
+/bin
+/output
 
 .DS_Store
 *.iml
