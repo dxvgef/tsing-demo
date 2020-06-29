@@ -17,13 +17,14 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/dxvgef/filter v0.0.0-20200628111413-0cdc077ae34a
+	github.com/dxvgef/filter/v2 v2.1.1
 	github.com/dxvgef/sessions v0.4.6
 	github.com/dxvgef/tsing v1.2.2
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.2
 	github.com/go-pg/pg/v9 v9.1.6
 	github.com/go-pg/urlstruct v0.4.0 // indirect
+	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-redis/redis/v7 v7.4.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect

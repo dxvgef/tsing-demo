@@ -3,7 +3,7 @@ package handler
 import (
 	"time"
 
-	"github.com/dxvgef/filter"
+	"github.com/dxvgef/filter/v2"
 	"github.com/dxvgef/tsing"
 	"github.com/gbrlsnchs/jwt/v3"
 )
