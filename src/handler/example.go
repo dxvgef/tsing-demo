@@ -64,15 +64,15 @@ func (*Example) Index(ctx *tsing.Context) error {
 		username string
 		password string
 	}
-	// 过滤多个元素
-	err := filter.MSet(
-		// 要过滤的元素
-		filter.El(&reqData.username, filter.FromString(ctx.Query("username"), "账号").
-			RemoveSpace().MinLength(3).MaxLength(16)), // 要求最大长度
-		filter.El(&reqData.password, filter.FromString(ctx.Query("password"), "密码").
-			MinLength(6).MaxLength(32).MustHasDigit().MustHasUpper().MustHasLower().MustHasSymbol(),
-		),
+	err := filter.Batch(
+		filter.String(ctx.Post("username"), "账号").
+			Require().RemoveSpace().MinLength(3).MaxLength(16).
+			Set(&reqData.username),
+		filter.String(ctx.Post("password"), "密码").
+			Require().MinLength(6).MaxLength(32).HasDigit().HasUpper().HasLower().HasSymbol().
+			Set(&reqData.username),
 	)
+
 	if err != nil {
 		return err
 	}
