@@ -17,7 +17,7 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/dxvgef/filter v1.8.1
+	github.com/dxvgef/filter/v2 v2.1.1
 	github.com/dxvgef/sessions v0.5.0
 	github.com/dxvgef/tsing v1.3.0
 	github.com/fsnotify/fsnotify v1.4.9
