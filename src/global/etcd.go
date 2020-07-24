@@ -12,11 +12,11 @@ var ETCDClient client.KeysAPI
 // 设置ETCD Client
 func SetETCDClient() error {
 	config, err := client.New(client.Config{
-		Endpoints:               LocalConfig.ETCD.Endpoints,
+		Endpoints:               Config.ETCD.Endpoints,
 		Transport:               client.DefaultTransport,
-		Username:                LocalConfig.ETCD.Username,
-		Password:                LocalConfig.ETCD.Password,
-		HeaderTimeoutPerRequest: time.Duration(LocalConfig.ETCD.HeaderTimeoutPerRequest) * time.Second,
+		Username:                Config.ETCD.Username,
+		Password:                Config.ETCD.Password,
+		HeaderTimeoutPerRequest: time.Duration(Config.ETCD.HeaderTimeoutPerRequest) * time.Second,
 	})
 	if err != nil {
 		return err

@@ -21,12 +21,12 @@ var appServer *http.Server
 func Config() {
 	var config tsing.Config
 	config.EventHandler = handler.EventHandler
-	config.Recover = global.LocalConfig.Service.Recover
+	config.Recover = global.Config.Service.Recover
 	log.Debug().Bool("recover", config.Recover)
-	config.EventShortPath = global.LocalConfig.Service.EventShortPath
-	config.EventSource = global.LocalConfig.Service.EventSource
-	config.EventTrace = global.LocalConfig.Service.EventTrace
-	config.EventHandlerError = global.LocalConfig.Service.EventHandlerError
+	config.EventShortPath = global.Config.Service.EventShortPath
+	config.EventSource = global.Config.Service.EventSource
+	config.EventTrace = global.Config.Service.EventTrace
+	config.EventHandlerError = global.Config.Service.EventHandlerError
 	rootPath, err := os.Getwd()
 	if err == nil {
 		config.RootPath = rootPath + "/src/"
@@ -38,19 +38,19 @@ func Config() {
 	setRouter()
 
 	// 如果是调试模式，注册pprof路由
-	if global.LocalConfig.Service.Debug {
+	if global.Config.Service.Debug {
 		pprofRouter()
 	}
 
 	// 定义HTTP服务
 	appServer = &http.Server{
-		Addr:    global.LocalConfig.Service.IP + ":" + strconv.Itoa(global.LocalConfig.Service.Port),
+		Addr:    global.Config.Service.IP + ":" + strconv.Itoa(global.Config.Service.Port),
 		Handler: app, // 调度器
 		// ErrorLog:          global.Logger.StdError,                                                    // 日志记录器
-		ReadTimeout:       time.Duration(global.LocalConfig.Service.ReadTimeout) * time.Second,       // 读取超时
-		WriteTimeout:      time.Duration(global.LocalConfig.Service.WriteTimeout) * time.Second,      // 响应超时
-		IdleTimeout:       time.Duration(global.LocalConfig.Service.IdleTimeout) * time.Second,       // 连接空闲超时
-		ReadHeaderTimeout: time.Duration(global.LocalConfig.Service.ReadHeaderTimeout) * time.Second, // http header读取超时
+		ReadTimeout:       time.Duration(global.Config.Service.ReadTimeout) * time.Second,       // 读取超时
+		WriteTimeout:      time.Duration(global.Config.Service.WriteTimeout) * time.Second,      // 响应超时
+		IdleTimeout:       time.Duration(global.Config.Service.IdleTimeout) * time.Second,       // 连接空闲超时
+		ReadHeaderTimeout: time.Duration(global.Config.Service.ReadHeaderTimeout) * time.Second, // http header读取超时
 	}
 }
 
@@ -74,7 +74,7 @@ func Start() {
 	<-quit
 
 	// 指定退出超时时间
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.LocalConfig.Service.QuitWaitTimeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.Config.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if err := appServer.Shutdown(ctx); err != nil {
 		log.Fatal().Caller().Msg(err.Error())

@@ -25,7 +25,7 @@ func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Co
 
 // AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
-	if !LocalConfig.Database.StmtLog {
+	if !Config.Database.StmtLog {
 		return nil
 	}
 	// 记录SQL语句
@@ -46,30 +46,30 @@ func SetDatabase() error {
 		return nil
 	}
 	// 读取配置文件
-	if LocalConfig.Database.Addr == "" {
+	if Config.Database.Addr == "" {
 		return errors.New("配置文件[database]节点的addr参数不正确")
 	}
-	if LocalConfig.Database.User == "" {
+	if Config.Database.User == "" {
 		return errors.New("配置文件[database]节点的user参数不正确")
 	}
-	if LocalConfig.Database.Name == "" {
+	if Config.Database.Name == "" {
 		return errors.New("配置文件[database]节点的name参数不正确")
 	}
 
 	// 连接数据库
 	DB = pg.Connect(&pg.Options{
-		Addr:         LocalConfig.Database.Addr,
-		User:         LocalConfig.Database.User,
-		Password:     LocalConfig.Database.Password,
-		Database:     LocalConfig.Database.Name,
-		DialTimeout:  time.Duration(LocalConfig.Database.DialTimeout) * time.Second,
-		ReadTimeout:  time.Duration(LocalConfig.Database.ReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(LocalConfig.Database.WriteTimeout) * time.Second,
-		PoolSize:     LocalConfig.Database.PoolSize,
+		Addr:         Config.Database.Addr,
+		User:         Config.Database.User,
+		Password:     Config.Database.Password,
+		Database:     Config.Database.Name,
+		DialTimeout:  time.Duration(Config.Database.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(Config.Database.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(Config.Database.WriteTimeout) * time.Second,
+		PoolSize:     Config.Database.PoolSize,
 	})
 
 	// 注册查询钩子
-	if LocalConfig.Database.StmtLog {
+	if Config.Database.StmtLog {
 		DB.AddQueryHook(QueryHook{})
 	}
 
