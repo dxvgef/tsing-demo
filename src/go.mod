@@ -17,9 +17,9 @@ require (
 	github.com/coreos/pkg v0.0.0-20180928190104-399ea9e2e55f // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/dxvgef/filter/v2 v2.1.1
-	github.com/dxvgef/sessions v0.4.6
-	github.com/dxvgef/tsing v1.2.2
+	github.com/dxvgef/filter/v2 v2.1.4
+	github.com/dxvgef/sessions v0.7.0
+	github.com/dxvgef/tsing v1.3.10
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gbrlsnchs/jwt/v3 v3.0.0-rc.2
 	github.com/go-pg/pg/v9 v9.1.6
@@ -29,6 +29,7 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/google/btree v1.0.0 // indirect
+	github.com/google/uuid v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
