@@ -7,16 +7,16 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/BurntSushi/toml"
 	"github.com/fsnotify/fsnotify"
+	"github.com/pelletier/go-toml"
 	"gopkg.in/yaml.v2"
 )
 
 // 配置文件路径(仅在成功加载配置文件并且解析成功后有值)
-var LocalConfigPath string
+var ConfigPath string
 
-// LocalConfig 全局配置
-var LocalConfig struct {
+// Config 全局配置
+var Config struct {
 	Service struct {
 		IP                    string `yaml:"ip" toml:"ip"`
 		Port                  int    `yaml:"port" toml:"port"`
@@ -79,33 +79,34 @@ var LocalConfig struct {
 
 // 加载TOML配置文件
 func LoadTOMLConfig() error {
-	if LocalConfigPath == "" {
-		flag.StringVar(&LocalConfigPath, "c", "./config.toml", "配置文件路径")
+	if ConfigPath == "" {
+		flag.StringVar(&ConfigPath, "c", "./config.toml", "配置文件路径")
 		flag.Parse()
 	}
-
-	_, err := toml.DecodeFile(LocalConfigPath, &LocalConfig)
+	file, err := os.Open(filepath.Clean(ConfigPath))
 	if err != nil {
-		LocalConfigPath = ""
 		return err
 	}
-
+	err = toml.NewDecoder(file).Decode(&Config)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // 加载YAML配置文件
 func LoadYAMLConfig() error {
-	if LocalConfigPath == "" {
-		flag.StringVar(&LocalConfigPath, "c", "./config.yaml", "配置文件路径")
+	if ConfigPath == "" {
+		flag.StringVar(&ConfigPath, "c", "./config.yaml", "配置文件路径")
 		flag.Parse()
 	}
-	file, err := os.Open(filepath.Clean(LocalConfigPath))
+	file, err := os.Open(filepath.Clean(ConfigPath))
 	if err != nil {
 		return err
 	}
-	err = yaml.NewDecoder(file).Decode(&LocalConfig)
+	err = yaml.NewDecoder(file).Decode(&Config)
 	if err != nil {
-		LocalConfigPath = ""
+		ConfigPath = ""
 		return err
 	}
 	return nil
@@ -113,7 +114,7 @@ func LoadYAMLConfig() error {
 
 // 监视配置文件更新
 func WatchConfig() error {
-	if LocalConfigPath == "" {
+	if ConfigPath == "" {
 		return errors.New("配置文件没有成功解析，无法启动监视")
 	}
 	// 创建监视器
@@ -148,7 +149,7 @@ func WatchConfig() error {
 		}()
 
 		// 添加要监视的文件
-		if err = watcher.Add(LocalConfigPath); err != nil {
+		if err = watcher.Add(ConfigPath); err != nil {
 			panic(err.Error())
 		}
 		<-done
