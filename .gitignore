@@ -1,10 +1,12 @@
 .idea
-.history
-.vscode
 /bin
 /output
-
-.DS_Store
 *.iml
+.DS_Store
+*.test
+.vscode
+.history
 *.log
-*.sum
+*.bak
+go.sum
+config.local.toml
