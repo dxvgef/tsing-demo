@@ -3,24 +3,29 @@ package global
 import (
 	"time"
 
-	"go.etcd.io/etcd/client"
+	"github.com/coreos/etcd/clientv3"
+	"github.com/rs/zerolog/log"
 )
 
-// etcd客户端
-var ETCDClient client.KeysAPI
+var EtcdCli *clientv3.Client
 
-// 设置ETCD Client
-func SetETCDClient() error {
-	config, err := client.New(client.Config{
-		Endpoints:               Config.ETCD.Endpoints,
-		Transport:               client.DefaultTransport,
-		Username:                Config.ETCD.Username,
-		Password:                Config.ETCD.Password,
-		HeaderTimeoutPerRequest: time.Duration(Config.ETCD.HeaderTimeoutPerRequest) * time.Second,
+func SetEtcdCli() (err error) {
+	EtcdCli, err = clientv3.New(clientv3.Config{
+		Endpoints:            Config.Etcd.Endpoints,
+		DialTimeout:          time.Duration(Config.Etcd.DialTimeout) * time.Second,
+		Username:             Config.Etcd.Username,
+		Password:             Config.Etcd.Password,
+		AutoSyncInterval:     time.Duration(Config.Etcd.AutoSyncInterval) * time.Second,
+		DialKeepAliveTime:    time.Duration(Config.Etcd.DialKeepAliveTime) * time.Second,
+		DialKeepAliveTimeout: time.Duration(Config.Etcd.DialKeepAliveTimeout) * time.Second,
+		MaxCallSendMsgSize:   int(Config.Etcd.MaxCallSendMsgSize),
+		MaxCallRecvMsgSize:   int(Config.Etcd.MaxCallRecvMsgSize),
+		RejectOldCluster:     Config.Etcd.RejectOldCluster,
+		PermitWithoutStream:  Config.Etcd.PermitWithoutStream,
 	})
 	if err != nil {
-		return err
+		log.Err(err).Caller().Send()
+		return
 	}
-	ETCDClient = client.NewKeysAPI(config)
-	return nil
+	return
 }

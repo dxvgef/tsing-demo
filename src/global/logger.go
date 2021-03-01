@@ -10,6 +10,31 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// 使用默认参数设置logger，用于没有读取到配置文件时替代标准包的log使用
+func SetDefaultLogger() {
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+
+	zerolog.TimeFieldFormat = Now("y-m-d h:i:s")
+
+	output := zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: zerolog.TimeFieldFormat,
+	}
+
+	log.Logger = log.Output(output)
+}
+
+// 当前时间转为字符串
+func Now(str string) string {
+	str = strings.Replace(str, "y", "2006", -1)
+	str = strings.Replace(str, "m", "01", -1)
+	str = strings.Replace(str, "d", "02", -1)
+	str = strings.Replace(str, "h", "15", -1)
+	str = strings.Replace(str, "i", "04", -1)
+	str = strings.Replace(str, "s", "05", -1)
+	return str
+}
+
 // 设置logger
 func SetLogger() error {
 	// 设置级别
@@ -34,13 +59,15 @@ func SetLogger() error {
 	if Config.Logger.TimeFormat == "timestamp" {
 		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	} else {
-		zerolog.TimeFieldFormat = timeFormater(Config.Logger.TimeFormat)
+		zerolog.TimeFieldFormat = Now(Config.Logger.TimeFormat)
 	}
 
 	// 设置日志输出方式
-	var output io.Writer
-	var logFile *os.File
-	var err error
+	var (
+		output  io.Writer
+		logFile *os.File
+		err     error
+	)
 	// 设置日志文件
 	if Config.Logger.FilePath != "" {
 		// 输出到文件
@@ -64,6 +91,7 @@ func SetLogger() error {
 		} else {
 			output = zerolog.ConsoleWriter{
 				Out:        os.Stdout,
+				NoColor:    Config.Logger.NoColor,
 				TimeFormat: zerolog.TimeFieldFormat,
 			}
 		}
@@ -75,20 +103,10 @@ func SetLogger() error {
 			output = os.Stdout
 		}
 	default:
-		return errors.New("从配置文件的logger.encode中获得了未知的参数，目前只支持json|console")
+		return errors.New("logger.encode配置参数值只支持json和console")
 	}
 
 	log.Logger = log.Output(output)
 
 	return nil
-}
-
-func timeFormater(str string) string {
-	str = strings.Replace(str, "y", "2006", -1)
-	str = strings.Replace(str, "m", "01", -1)
-	str = strings.Replace(str, "d", "02", -1)
-	str = strings.Replace(str, "h", "15", -1)
-	str = strings.Replace(str, "i", "04", -1)
-	str = strings.Replace(str, "s", "05", -1)
-	return str
 }

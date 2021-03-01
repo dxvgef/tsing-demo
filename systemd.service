@@ -1,0 +1,28 @@
+[Unit]
+Description=[{ProcessName}]
+After=network.target
+
+# 尝试自动重启的次数
+StartLimitBurst=3
+
+# 尝试自动重启的频率限制，0表示不限制
+StartLimitIntervalSec=0
+
+[Service]
+# 工作路径
+WorkingDirectory=[{WorkDir}]
+
+# 如果服务意外中止，自动尝试重启服务
+Restart=always
+
+# 自动重启的间隔时间，默认是毫秒
+RestartSec=1s
+
+# 启动服务的命令
+ExecStart=[{WorkDir}]/[{ProcessName}] -env=[{Env}]
+
+# 停止服务的命令
+ExecStop=pkill [{ProcessName}]
+
+[Install]
+WantedBy=multi-user.target

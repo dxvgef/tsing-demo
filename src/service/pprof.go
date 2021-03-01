@@ -1,3 +1,5 @@
+// 性能分析
+
 package service
 
 import (
@@ -8,7 +10,7 @@ import (
 
 // pprof路由
 func pprofRouter() {
-	router := app.Group("/debug/pprof")
+	router := engine.Group("/debug/pprof")
 	router.GET("/", indexHandler)
 	router.GET("/heap", heapHandler)
 	router.GET("/block", blockHandler)

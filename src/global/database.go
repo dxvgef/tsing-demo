@@ -65,7 +65,7 @@ func SetDatabase() error {
 		DialTimeout:  time.Duration(Config.Database.DialTimeout) * time.Second,
 		ReadTimeout:  time.Duration(Config.Database.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(Config.Database.WriteTimeout) * time.Second,
-		PoolSize:     Config.Database.PoolSize,
+		PoolSize:     int(Config.Database.PoolSize),
 	})
 
 	// 注册查询钩子
