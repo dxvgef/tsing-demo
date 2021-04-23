@@ -9,4 +9,4 @@
 *.log
 *.bak
 go.sum
-config.local.toml
+/config.local.toml
