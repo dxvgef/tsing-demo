@@ -1,5 +1,5 @@
 # 项目ID
-project_id="uam"
+project_id="tsing"
 
 # 服务版本号
 version="v1"
@@ -10,13 +10,13 @@ version="v1"
 ###################### 服务参数 ###############################
 [service]
 # 服务ID
-id="demo-service"
+id="tsing-demo"
 
 # 连接密码
 secret="123456"
 
 # 调试模式，会将详细的错误信息输出给客户端
-debug=true
+debug=false
 
 # 监听地址，留空表示监听0.0.0.0
 # ip=""
@@ -60,10 +60,10 @@ event_short_path=false
 ###################### 日志记录参数 ###############################
 [logger]
 # 记录级别，支持以下值，留空则禁用logger，支持: empty(不显示级别)/debug/info/warn/error
-level="debug"
+level="info"
 
 # 日志文件的路径，如果留空则不写文件
-file_path=""
+file_path="./output.log"
 
 # 日志时间格式(年-月-日 时:分:秒)
 time_format="y-m-d h:i:s"
@@ -96,7 +96,7 @@ weight=1
 ###################### etcd 参数 ###############################
 [etcd]
 # 端点URL，可以写多个
-endpoints=["http://192.168.50.212:2379"]
+endpoints=["http://127.0.0.1:2379"]
 
 # username=""
 
@@ -121,7 +121,7 @@ endpoints=["http://192.168.50.212:2379"]
 ###################### redis 参数 ###############################
 [redis]
 # redis地址:端口
-addr="192.168.50.212:6379"
+addr="127.0.0.1:6379"
 
 # redis连接密码
 # password=""
@@ -136,7 +136,7 @@ key_prefix=""
 ###################### 数据库参数 ###############################
 [database]
 # 地址
-addr="192.168.50.212:5432"
+addr="127.0.0.1:5432"
 
 # 账号
 user="postgres"
@@ -145,7 +145,7 @@ user="postgres"
 password="123456"
 
 # 库名
-name="uam_main"
+name="tsing"
 
 # 记录SQL语句，建议仅开发时使用
 stmt_log=false
@@ -170,7 +170,7 @@ stmt_log=false
 aes_key="1111111111111111"
 
 # session id的cookie键名
-cookie_name="test_sid"
+cookie_name="sessionid"
 
 # HTTP Only
 # http_only=false
@@ -185,10 +185,10 @@ cookie_name="test_sid"
 # idle_time=40
 
 # redis的键名前缀
-redis_key_prefix="demo_sess_"
+redis_key_prefix="sess_"
 
 # redis的连接地址
-redis_addr="192.168.50.212:6379"
+redis_addr="127.0.0.1:6379"
 
 # redis的连接密码
 redis_password="123456"

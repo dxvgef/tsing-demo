@@ -1,5 +1,5 @@
 # 项目ID
-project_id="uam"
+project_id="tsing"
 
 # 服务版本号
 version="v1"
@@ -96,7 +96,7 @@ weight=1
 ###################### etcd 参数 ###############################
 [etcd]
 # 端点URL，可以写多个
-endpoints=["http://192.168.50.212:2379"]
+endpoints=["http://127.0.0.1:2379"]
 
 # username=""
 
@@ -121,7 +121,7 @@ endpoints=["http://192.168.50.212:2379"]
 ###################### redis 参数 ###############################
 [redis]
 # redis地址:端口
-addr="192.168.50.212:6379"
+addr="127.0.0.1:6379"
 
 # redis连接密码
 # password=""
@@ -136,7 +136,7 @@ key_prefix=""
 ###################### 数据库参数 ###############################
 [database]
 # 地址
-addr="192.168.50.212:5432"
+addr="127.0.0.1:5432"
 
 # 账号
 user="postgres"
@@ -145,7 +145,7 @@ user="postgres"
 password="123456"
 
 # 库名
-name="uam_main"
+name="tsing"
 
 # 记录SQL语句，建议仅开发时使用
 stmt_log=false
@@ -170,7 +170,7 @@ stmt_log=false
 aes_key="1111111111111111"
 
 # session id的cookie键名
-cookie_name="test_sid"
+cookie_name="sessionid"
 
 # HTTP Only
 # http_only=false
@@ -185,10 +185,10 @@ cookie_name="test_sid"
 # idle_time=40
 
 # redis的键名前缀
-redis_key_prefix="demo_sess_"
+redis_key_prefix="sess_"
 
 # redis的连接地址
-redis_addr="192.168.50.212:6379"
+redis_addr="127.0.0.1:6379"
 
 # redis的连接密码
 redis_password="123456"

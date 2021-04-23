@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coreos/etcd/clientv3"
 	"github.com/pelletier/go-toml"
 	"github.com/rs/zerolog/log"
+	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 var Config struct {

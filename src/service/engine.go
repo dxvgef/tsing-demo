@@ -33,7 +33,7 @@ func Config() {
 		config.RootPath = rootPath + "/src/"
 	}
 
-	engine = tsing.New(config)
+	engine = tsing.New(&config)
 
 	// 设置路由
 	setRouter()

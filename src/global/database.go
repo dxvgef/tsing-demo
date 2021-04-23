@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/go-pg/pg/v9"
+	"github.com/go-pg/pg/v10"
 	"github.com/rs/zerolog/log"
 )
 
@@ -34,7 +34,7 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 		log.Error().Msg(err.Error())
 	}
 
-	log.Debug().Msg(stmt)
+	log.Debug().Msg(BytesToStr(stmt))
 
 	return nil
 }
