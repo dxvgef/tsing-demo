@@ -177,7 +177,7 @@ func LoadConfig() error {
 		log.Fatal().Err(err).Caller().Send()
 		return err
 	}
-	log.Info().Msg("本地配置加载成功")
+	log.Info().Str("env", Config.Env).Msg("本地配置加载成功")
 
 	// 如果不是本地模式启动
 	if Config.Env == "local" {
@@ -195,7 +195,7 @@ func LoadConfig() error {
 		log.Fatal().Err(err).Caller().Send()
 		return err
 	}
-	log.Info().Msg("远程配置加载成功")
+	log.Info().Str("env", Config.Env).Msg("远程配置加载成功")
 	return nil
 }
 
