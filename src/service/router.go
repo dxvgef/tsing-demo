@@ -8,6 +8,6 @@ import (
 
 // 设置路由
 func setRouter() {
-	engine.GET("/", handler.Demo)
-	engine.GET("/demo2", handler.Demo2)
+	engine.GET("/set", handler.Set)
+	engine.GET("/get", handler.Get)
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/dxvgef/tsing"
 )
 
-func Demo(ctx *tsing.Context) error {
+func Set(ctx *tsing.Context) error {
 	sess, err := global.Sessions.Use(ctx.Request, ctx.ResponseWriter)
 	if err != nil {
 		return err
@@ -17,7 +17,7 @@ func Demo(ctx *tsing.Context) error {
 	return String(ctx, 200, "ok")
 }
 
-func Demo2(ctx *tsing.Context) error {
+func Get(ctx *tsing.Context) error {
 	sess, err := global.Sessions.Use(ctx.Request, ctx.ResponseWriter)
 	if err != nil {
 		return err
