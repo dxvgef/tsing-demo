@@ -72,6 +72,7 @@ var Config struct {
 	Redis struct {
 		Addr      string `json:"addr" toml:"addr"`
 		DB        int    `json:"db" toml:"db"`
+		Username  string `json:"username" toml:"username"`
 		Password  string `json:"password" toml:"password"`
 		KeyPrefix string `json:"key_prefix" toml:"key_prefix"`
 	} `json:"redis" toml:"redis"`
@@ -89,16 +90,15 @@ var Config struct {
 	} `json:"database" toml:"database"`
 
 	Session struct {
-		AESKey         string `json:"aes_key" toml:"aes_key"`
 		CookieName     string `json:"cookie_name" toml:"cookie_name"`
-		MaxAge         uint   `json:"max_age" toml:"max_age"`
-		IdleTime       uint   `json:"idle_time" toml:"idle_time"`
+		RedisAddr      string `json:"redis_addr" toml:"redis_addr"`
+		RedisUsername  string `json:"redis_username" toml:"redis_username"`
+		RedisPassword  string `json:"redis_password" toml:"redis_password"`
+		RedisKeyPrefix string `json:"redis_key_prefix" toml:"redis_key_prefix"`
+		IdleTimeout    uint   `json:"idle_timeout" toml:"idle_timeout"`
 		HTTPOnly       bool   `json:"http_only" toml:"http_only"`
 		Secure         bool   `json:"secure" toml:"secure"`
-		RedisAddr      string `json:"redis_addr" toml:"redis_addr"`
-		RedisPassword  string `json:"redis_password" toml:"redis_password"`
-		RedisDB        int    `json:"redis_db" toml:"redis_db"`
-		RedisKeyPrefix string `json:"redis_key_prefix" toml:"redis_key_prefix"`
+		RedisDB        uint8  `json:"redis_db" toml:"redis_db"`
 	} `json:"session" toml:"session"`
 
 	ServiceCenter struct {
@@ -152,8 +152,7 @@ func loadDefault() {
 
 	// session默认配置
 	Config.Session.CookieName = "sessionid"
-	Config.Session.MaxAge = 60
-	Config.Session.IdleTime = 40
+	Config.Session.IdleTimeout = 40 * 60
 
 	// redis默认配置
 	Config.Redis.Addr = "127.0.0.1:6379"

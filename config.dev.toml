@@ -16,7 +16,7 @@ id="tsing-demo"
 secret="123456"
 
 # 调试模式，会将详细的错误信息输出给客户端
-debug=false
+debug=true
 
 # 监听地址，留空表示监听0.0.0.0
 # ip=""
@@ -60,10 +60,10 @@ event_short_path=false
 ###################### 日志记录参数 ###############################
 [logger]
 # 记录级别，支持以下值，留空则禁用logger，支持: empty(不显示级别)/debug/info/warn/error
-level="info"
+level="debug"
 
 # 日志文件的路径，如果留空则不写文件
-file_path="./output.log"
+file_path=""
 
 # 日志时间格式(年-月-日 时:分:秒)
 time_format="y-m-d h:i:s"
@@ -96,7 +96,7 @@ weight=1
 ###################### etcd 参数 ###############################
 [etcd]
 # 端点URL，可以写多个
-endpoints=["http://127.0.0.1:2379"]
+endpoints=["http://192.168.50.212:2379"]
 
 # username=""
 
@@ -122,6 +122,9 @@ endpoints=["http://127.0.0.1:2379"]
 [redis]
 # redis地址:端口
 addr="127.0.0.1:6379"
+
+# redis连接账号
+# username=""
 
 # redis连接密码
 # password=""
@@ -164,11 +167,6 @@ stmt_log=false
 
 ###################### session 参数 ###############################
 [session]
-# session id的加密密钥
-# 由于session id在客户端可见，因此需要加密
-# 密钥的长度16,24,32对应AES-128,AES-192,AES-256算
-aes_key="1111111111111111"
-
 # session id的cookie键名
 cookie_name="sessionid"
 
@@ -182,7 +180,7 @@ cookie_name="sessionid"
 # max_age=60
 
 # 空闲超时(分)
-# idle_time=40
+# idle_timeout=40
 
 # redis的键名前缀
 redis_key_prefix="sess_"
@@ -190,8 +188,11 @@ redis_key_prefix="sess_"
 # redis的连接地址
 redis_addr="127.0.0.1:6379"
 
+# redis的连接账号
+# redis_username="dxvgef"
+
 # redis的连接密码
-redis_password="123456"
+# redis_password="123456"
 
 # redis的库编号
 # redis_db=0
