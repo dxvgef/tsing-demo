@@ -169,6 +169,8 @@ func LoadConfig() (err error) {
 
 	LaunchConfig.Env = strings.ToLower(LaunchConfig.Env)
 
+	log.Info().Str("cfg", LaunchConfig.ConfigSource).Str("env", LaunchConfig.Env).Str("sid", LaunchConfig.ServiceID).Msg("参数配置")
+
 	// 加载本地配置文件
 	if LaunchConfig.ConfigSource == LOCAL {
 		// 加载本地配置文件
@@ -176,7 +178,6 @@ func LoadConfig() (err error) {
 			log.Err(err).Caller().Send()
 			return err
 		}
-		log.Info().Str("env", LaunchConfig.Env).Msg("加载本地配置")
 		return nil
 	}
 
@@ -185,7 +186,6 @@ func LoadConfig() (err error) {
 		log.Err(err).Caller().Send()
 		return err
 	}
-	log.Info().Str("env", LaunchConfig.Env).Msg("远程配置加载成功")
 	return nil
 }
 
@@ -204,6 +204,7 @@ func loadConfigFile() error {
 		log.Err(err).Caller().Msg("解析本地配置文件失败")
 		return err
 	}
+	log.Info().Str("file", filePath).Msg("加载本地配置文件")
 	return nil
 }
 
@@ -251,5 +252,6 @@ func loadRemoteConfig() (err error) {
 			log.Info().Str("Key", remoteKey).Msg("加载远程定制配置成功")
 		}
 	}
+	log.Info().Strs("etcd", RuntimeConfig.Etcd.Endpoints).Msg("远程配置加载")
 	return nil
 }
