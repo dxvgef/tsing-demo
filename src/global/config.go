@@ -14,19 +14,21 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-var Config struct {
-	// 启动参数
-	Env string `toml:"-" json:"-"`
+const LOCAL = "local"
 
-	// 本地参数
-	ProjectID string `json:"-" toml:"project_id"`
-	Version   string `json:"-" toml:"version"`
+// 启动配置
+var LaunchConfig struct {
+	ConfigSource string // 配置来源(local或者服务中心地址'127.0.0.1:10000')
+	Env          string // 环境变量
+	ServiceID    string // 服务ID
+}
 
+// 运行时配置
+var RuntimeConfig struct {
 	Common struct {
 	} `json:"common" toml:"common"`
 
 	Service struct {
-		ID                    string `json:"-" toml:"id"` // 服务ID
 		Secret                string `json:"secret" toml:"secret"`
 		IP                    string `json:"-" toml:"-"`
 		HTTPPort              uint16 `json:"http_port" toml:"http_port"`
@@ -38,8 +40,6 @@ var Config struct {
 		QuitWaitTimeout       uint   `json:"quit_wait_timeout" toml:"quit_wait_timeout"`
 		HTTP2                 bool   `json:"http2" toml:"http2"`
 		Debug                 bool   `json:"-" toml:"debug"`
-		EventSource           bool   `json:"event_source" toml:"event_source"`
-		EventTrace            bool   `json:"event_trace" toml:"event_trace"`
 		EventNotFound         bool   `json:"event_not_found" toml:"event_not_found"`
 		EventMethodNotAllowed bool   `json:"event_method_not_allowed" toml:"event_method_not_allowed"`
 		Recover               bool   `json:"-" toml:"-"`
@@ -82,7 +82,6 @@ var Config struct {
 		User         string `json:"user" toml:"user"`
 		Password     string `json:"password" toml:"password"`
 		Name         string `json:"name" toml:"name"`
-		StmtLog      bool   `json:"stmt_log" toml:"stmt_log"`
 		DialTimeout  uint   `json:"dial_timeout" toml:"dial_timeout"`
 		ReadTimeout  uint   `json:"read_timeout" toml:"read_timeout"`
 		WriteTimeout uint   `json:"write_timeout" toml:"write_timeout"`
@@ -111,105 +110,98 @@ var Config struct {
 	} `json:"service_center" toml:"service_center"`
 }
 
-// 加载本地默认配置
-func loadDefault() {
-	// 公用默认配置
-	Config.Env = "local" // 环境变量(默认)
+// 设置本地默认配置
+func defaultConfig() {
+	// 环境变量
+	LaunchConfig.ConfigSource = LOCAL
+	LaunchConfig.Env = LOCAL
+	LaunchConfig.ServiceID = "tsing-demo"
 
 	// 服务默认配置
-	Config.Service.ReadTimeout = 10
-	Config.Service.ReadHeaderTimeout = 10
-	Config.Service.WriteTimeout = 10
-	Config.Service.IdleTimeout = 10
-	Config.Service.QuitWaitTimeout = 5
-	Config.Service.Debug = true
-	Config.Service.HTTPPort = 80
-	Config.Service.Recover = true
-	Config.Service.EventSource = true
-	Config.Service.EventTrace = true
-	Config.Service.EventNotFound = true
-	Config.Service.EventMethodNotAllowed = true
-	Config.Service.EventShortPath = true
+	RuntimeConfig.Service.ReadTimeout = 10
+	RuntimeConfig.Service.ReadHeaderTimeout = 10
+	RuntimeConfig.Service.WriteTimeout = 10
+	RuntimeConfig.Service.IdleTimeout = 10
+	RuntimeConfig.Service.QuitWaitTimeout = 5
+	RuntimeConfig.Service.Debug = true
+	RuntimeConfig.Service.HTTPPort = 80
+	RuntimeConfig.Service.Recover = true
+	RuntimeConfig.Service.EventNotFound = true
+	RuntimeConfig.Service.EventMethodNotAllowed = true
+	RuntimeConfig.Service.EventShortPath = true
 
 	// 日志默认配置
-	Config.Logger.Level = "debug"
-	Config.Logger.FileMode = 600
-	Config.Logger.Encode = "console"
-	Config.Logger.TimeFormat = "y-m-d h:i:s"
+	RuntimeConfig.Logger.Level = "debug"
+	RuntimeConfig.Logger.FileMode = 600
+	RuntimeConfig.Logger.Encode = "console"
+	RuntimeConfig.Logger.TimeFormat = "y-m-d h:i:s"
 
 	// etcd默认配置
-	Config.Etcd.Endpoints = []string{"http://127.0.0.1:2379"}
-	Config.Etcd.DialTimeout = 5
+	RuntimeConfig.Etcd.Endpoints = []string{"http://127.0.0.1:2379"}
+	RuntimeConfig.Etcd.DialTimeout = 5
 
 	// 数据库默认配置
-	Config.Database.Addr = "127.0.0.1:5432"
-	Config.Database.User = "postgres"
-	Config.Database.StmtLog = true
-	Config.Database.DialTimeout = 5
-	Config.Database.ReadTimeout = 10
-	Config.Database.WriteTimeout = 10
-	Config.Database.PoolSize = 200
+	RuntimeConfig.Database.Addr = "127.0.0.1:5432"
+	RuntimeConfig.Database.User = "postgres"
+	RuntimeConfig.Database.DialTimeout = 5
+	RuntimeConfig.Database.ReadTimeout = 10
+	RuntimeConfig.Database.WriteTimeout = 10
+	RuntimeConfig.Database.PoolSize = 200
 
 	// session默认配置
-	Config.Session.CookieName = "sessionid"
-	Config.Session.IdleTimeout = 40 * 60
+	RuntimeConfig.Session.CookieName = "sessionid"
+	RuntimeConfig.Session.IdleTimeout = 40 * 60
 
 	// redis默认配置
-	Config.Redis.Addr = "127.0.0.1:6379"
-	Config.Redis.KeyPrefix = "sess_"
+	RuntimeConfig.Redis.Addr = "127.0.0.1:6379"
+	RuntimeConfig.Redis.KeyPrefix = "sess_"
 }
 
 // 加载配置
-func LoadConfig() error {
+func LoadConfig() (err error) {
 	// 加载本地默认配置
-	loadDefault()
+	defaultConfig()
 
 	// 解析启动参数
-	flag.StringVar(&Config.Env, "env", Config.Env, "环境变量，默认值:"+Config.Env)
+	flag.StringVar(&LaunchConfig.ConfigSource, "cfg", LaunchConfig.ConfigSource, "配置来源，可以是'local'表示本地或者配置中心地址'ip:port'，默认'local'")
+	flag.StringVar(&LaunchConfig.Env, "env", LaunchConfig.Env, "环境变量，默认'local'")
 	flag.Parse()
 
-	Config.Env = strings.ToLower(Config.Env)
+	LaunchConfig.Env = strings.ToLower(LaunchConfig.Env)
 
 	// 加载本地配置文件
-	err := loadFile()
-	if err != nil {
-		log.Fatal().Err(err).Caller().Send()
-		return err
-	}
-	log.Info().Str("env", Config.Env).Msg("本地配置加载成功")
-
-	// 如果不是本地模式启动
-	if Config.Env == "local" {
-		return nil
-	}
-	// 实例化etcd客户端
-	if EtcdCli == nil {
-		if err = SetEtcdCli(); err != nil {
-			log.Fatal().Err(err).Caller().Send()
+	if LaunchConfig.ConfigSource == LOCAL {
+		// 加载本地配置文件
+		if err = loadConfigFile(); err != nil {
+			log.Err(err).Caller().Send()
 			return err
 		}
+		log.Info().Str("env", LaunchConfig.Env).Msg("加载本地配置")
+		return nil
 	}
+
 	// 加载远程配置
 	if err = loadRemoteConfig(); err != nil {
-		log.Fatal().Err(err).Caller().Send()
+		log.Err(err).Caller().Send()
 		return err
 	}
-	log.Info().Str("env", Config.Env).Msg("远程配置加载成功")
+	log.Info().Str("env", LaunchConfig.Env).Msg("远程配置加载成功")
 	return nil
 }
 
-// 加载本地yaml配置文件
-func loadFile() error {
-	file, err := os.Open(filepath.Clean("./config." + Config.Env + ".toml"))
+// 加载本地配置文件
+func loadConfigFile() error {
+	filePath := filepath.Clean("./config." + LaunchConfig.Env + ".toml")
+	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatal().Err(err).Caller().Send()
+		log.Err(err).Caller().Str("path", filePath).Msg("无法读取本地配置文件")
 		return err
 	}
 
-	// 解析yaml到Config
-	err = toml.NewDecoder(file).Decode(&Config)
+	// 解析配置文件到Config
+	err = toml.NewDecoder(file).Decode(&RuntimeConfig)
 	if err != nil {
-		log.Fatal().Err(err).Caller().Send()
+		log.Err(err).Caller().Msg("解析本地配置文件失败")
 		return err
 	}
 	return nil
@@ -221,14 +213,22 @@ func loadRemoteConfig() (err error) {
 		resp *clientv3.GetResponse
 		key  strings.Builder
 	)
-	key.WriteString("/" + Config.ProjectID)
-	key.WriteString("/" + Config.Version)
-	key.WriteString("/" + Config.Env)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(Config.Etcd.DialTimeout)*time.Second)
+	// 实例化etcd客户端
+	if EtcdCli == nil {
+		if err = SetEtcdCli(); err != nil {
+			log.Err(err).Caller().Msg("设置etcd客户端失败")
+			return err
+		}
+	}
+	key.WriteString("/")
+	key.WriteString(LaunchConfig.ServiceID)
+	key.WriteString("/")
+	key.WriteString(LaunchConfig.Env)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(RuntimeConfig.Etcd.DialTimeout)*time.Second)
 	defer cancel()
 	// 取出前缀下的所有的key
 	if resp, err = EtcdCli.Get(ctx, key.String(), clientv3.WithPrefix()); err != nil {
-		log.Fatal().Err(err).Caller().Send()
+		log.Err(err).Caller().Send()
 		return
 	}
 	// 遍历key来加载配置
@@ -236,16 +236,16 @@ func loadRemoteConfig() (err error) {
 		remoteKey := string(resp.Kvs[k].Key)
 		// 加载公用配置
 		if remoteKey == key.String() {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
-				log.Fatal().Err(err).Caller().Send()
+			if err = json.Unmarshal(resp.Kvs[k].Value, &RuntimeConfig); err != nil {
+				log.Err(err).Caller().Send()
 				return err
 			}
 			log.Info().Str("Key", remoteKey).Msg("加载远程公用配置成功")
 		}
 		// 加载定制配置
-		if strings.HasPrefix(remoteKey, key.String()+"/"+Config.Service.ID) {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
-				log.Fatal().Err(err).Caller().Send()
+		if strings.HasPrefix(remoteKey, key.String()+"/"+LaunchConfig.ServiceID) {
+			if err = json.Unmarshal(resp.Kvs[k].Value, &RuntimeConfig); err != nil {
+				log.Err(err).Caller().Send()
 				return err
 			}
 			log.Info().Str("Key", remoteKey).Msg("加载远程定制配置成功")

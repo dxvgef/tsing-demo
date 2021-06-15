@@ -16,22 +16,22 @@ type QueryHook struct{}
 
 // BeforeQuery 查询前钩子
 func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Context, error) {
-	// 连接数据库
+	// 自动重连数据库
 	if err := SetDatabase(); err != nil {
-		log.Error().Msg(err.Error())
+		log.Err(err).Caller().Send()
 	}
 	return ctx, nil
 }
 
 // AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
-	if !Config.Database.StmtLog {
+	if !RuntimeConfig.Service.Debug {
 		return nil
 	}
 	// 记录SQL语句
 	stmt, err := qe.FormattedQuery()
 	if err != nil {
-		log.Error().Msg(err.Error())
+		log.Err(err).Caller().Send()
 	}
 
 	log.Debug().Msg(BytesToStr(stmt))
@@ -46,32 +46,30 @@ func SetDatabase() error {
 		return nil
 	}
 	// 读取配置文件
-	if Config.Database.Addr == "" {
+	if RuntimeConfig.Database.Addr == "" {
 		return errors.New("配置文件[database]节点的addr参数不正确")
 	}
-	if Config.Database.User == "" {
+	if RuntimeConfig.Database.User == "" {
 		return errors.New("配置文件[database]节点的user参数不正确")
 	}
-	if Config.Database.Name == "" {
+	if RuntimeConfig.Database.Name == "" {
 		return errors.New("配置文件[database]节点的name参数不正确")
 	}
 
 	// 连接数据库
 	DB = pg.Connect(&pg.Options{
-		Addr:         Config.Database.Addr,
-		User:         Config.Database.User,
-		Password:     Config.Database.Password,
-		Database:     Config.Database.Name,
-		DialTimeout:  time.Duration(Config.Database.DialTimeout) * time.Second,
-		ReadTimeout:  time.Duration(Config.Database.ReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(Config.Database.WriteTimeout) * time.Second,
-		PoolSize:     int(Config.Database.PoolSize),
+		Addr:         RuntimeConfig.Database.Addr,
+		User:         RuntimeConfig.Database.User,
+		Password:     RuntimeConfig.Database.Password,
+		Database:     RuntimeConfig.Database.Name,
+		DialTimeout:  time.Duration(RuntimeConfig.Database.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(RuntimeConfig.Database.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(RuntimeConfig.Database.WriteTimeout) * time.Second,
+		PoolSize:     int(RuntimeConfig.Database.PoolSize),
 	})
 
-	// 注册查询钩子
-	if Config.Database.StmtLog {
-		DB.AddQueryHook(QueryHook{})
-	}
+	// 注册钩子
+	DB.AddQueryHook(QueryHook{})
 
 	return nil
 }

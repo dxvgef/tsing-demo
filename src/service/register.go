@@ -21,10 +21,10 @@ func SetCenter() {
 
 	// 新建tsing center客户端实例
 	tc, err = tsingCenter.New(tsingCenter.Config{
-		Addr:          global.Config.ServiceCenter.Addr,          // tsing center api地址
-		Secret:        global.Config.ServiceCenter.Secret,        // tsing center api请求密钥
-		TouchInterval: global.Config.ServiceCenter.TouchInterval, // 自动触活的间隔时间(秒)
-		Timeout:       global.Config.ServiceCenter.Timeout,       // api请求超时时间(秒)
+		Addr:          global.RuntimeConfig.ServiceCenter.Addr,          // tsing center api地址
+		Secret:        global.RuntimeConfig.ServiceCenter.Secret,        // tsing center api请求密钥
+		TouchInterval: global.RuntimeConfig.ServiceCenter.TouchInterval, // 自动触活的间隔时间(秒)
+		Timeout:       global.RuntimeConfig.ServiceCenter.Timeout,       // api请求超时时间(秒)
 	})
 	if err != nil {
 		log.Fatal().Err(err).Caller().Send()
@@ -35,37 +35,38 @@ func SetCenter() {
 		log.Fatal().Err(err).Caller().Send()
 	}
 	// 获得端口
-	if global.Config.Service.HTTPSPort > 0 {
-		port = global.Config.Service.HTTPSPort
-	} else if global.Config.Service.HTTPPort > 0 {
-		port = global.Config.Service.HTTPPort
+	// nolint:gocritic
+	if global.RuntimeConfig.Service.HTTPSPort > 0 {
+		port = global.RuntimeConfig.Service.HTTPSPort
+	} else if global.RuntimeConfig.Service.HTTPPort > 0 {
+		port = global.RuntimeConfig.Service.HTTPPort
 	} else {
 		log.Fatal().Err(err).Caller().Msg("服务端口号无效")
 	}
 
 	// 注册服务
 	if _, err = tc.SetService(tsingCenter.Service{
-		ID:          global.Config.Service.ID,
+		ID:          global.LaunchConfig.ServiceID,
 		LoadBalance: "SWRR",
 	}); err != nil {
 		log.Fatal().Err(err).Caller().Send()
 	}
 
 	// 注册节点
-	if _, err = tc.SetNode(global.Config.Service.ID, tsingCenter.Node{
+	if _, err = tc.SetNode(global.LaunchConfig.ServiceID, tsingCenter.Node{
 		IP:     ip,
 		Port:   port,
-		TTL:    global.Config.ServiceCenter.TTL,
-		Weight: global.Config.ServiceCenter.Weight,
+		TTL:    global.RuntimeConfig.ServiceCenter.TTL,
+		Weight: global.RuntimeConfig.ServiceCenter.Weight,
 	}); err != nil {
 		log.Fatal().Err(err).Caller().Send()
 	}
 
-	log.Info().Str("ID", global.Config.Service.ID).Uint("AutoTouchInterval", global.Config.ServiceCenter.TouchInterval).Str("IP", ip).Uint16("Port", port).Uint("TTL", global.Config.ServiceCenter.TTL).Uint("Weight", global.Config.ServiceCenter.Weight).Msg("服务注册成功")
+	log.Info().Str("ServiceID", global.LaunchConfig.ServiceID).Uint("AutoTouchInterval", global.RuntimeConfig.ServiceCenter.TouchInterval).Str("IP", ip).Uint16("Port", port).Uint("TTL", global.RuntimeConfig.ServiceCenter.TTL).Uint("Weight", global.RuntimeConfig.ServiceCenter.Weight).Msg("服务注册成功")
 
 	// 服务发现
 	// var node tsingCenter.Node
-	// node, _, err = tc.DiscoverService(global.Config.ServiceID)
+	// node, _, err = tc.DiscoverService(global.RuntimeConfig.ServiceID)
 	// if err != nil {
 	// 	log.Fatal().Err(err).Caller().Msg("服务发现失败")
 	// }
@@ -75,7 +76,7 @@ func SetCenter() {
 	// 	log.Debug().Str("ip", node.IP).Uint16("port", node.Port).Caller().Send()
 	// }
 
-	tc.AutoTouchNode(global.Config.Service.ID, ip, port, func(status int, err error) {
+	tc.AutoTouchNode(global.LaunchConfig.ServiceID, ip, port, func(status int, err error) {
 		log.Err(err).Caller().Msg("自动触活失败")
 	})
 }

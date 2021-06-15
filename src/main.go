@@ -32,5 +32,7 @@ func main() {
 	}
 
 	// 启动服务
-	service.Start()
+	if err := service.Start(); err != nil {
+		log.Fatal().Err(err).Msg("启动服务失败")
+	}
 }
