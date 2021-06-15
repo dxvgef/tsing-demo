@@ -3,6 +3,7 @@ package global
 import (
 	"github.com/dxvgef/sessions"
 	"github.com/dxvgef/sessions/storage/redis"
+	"github.com/rs/zerolog/log"
 )
 
 // Sessions 引擎
@@ -19,6 +20,7 @@ func SetSessions() (err error) {
 		Prefix:   RuntimeConfig.Session.RedisKeyPrefix,
 		DB:       RuntimeConfig.Session.RedisDB,
 	}); err != nil {
+		log.Err(err).Caller().Msg("Session存储器配置失败")
 		return
 	}
 
@@ -30,6 +32,7 @@ func SetSessions() (err error) {
 		Path:        "/",
 		IdleTimeout: RuntimeConfig.Session.IdleTimeout, // 空闲超时时间(秒)
 	}, storage); err != nil {
+		log.Err(err).Caller().Msg("Session引擎配置失败")
 		return
 	}
 	return

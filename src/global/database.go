@@ -40,20 +40,26 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 }
 
 // SetDatabase 设置数据库
-func SetDatabase() error {
+func SetDatabase() (err error) {
 	// 判断是否需要重启赋值
 	if DB != nil {
 		return nil
 	}
 	// 读取配置文件
 	if RuntimeConfig.Database.Addr == "" {
-		return errors.New("配置文件[database]节点的addr参数不正确")
+		err = errors.New("配置文件[database]节点的addr参数不正确")
+		log.Err(err).Caller().Msg("数据库配置失败")
+		return
 	}
 	if RuntimeConfig.Database.User == "" {
-		return errors.New("配置文件[database]节点的user参数不正确")
+		err = errors.New("配置文件[database]节点的user参数不正确")
+		log.Err(err).Caller().Msg("数据库配置失败")
+		return
 	}
 	if RuntimeConfig.Database.Name == "" {
-		return errors.New("配置文件[database]节点的name参数不正确")
+		err = errors.New("配置文件[database]节点的name参数不正确")
+		log.Err(err).Caller().Msg("数据库配置失败")
+		return
 	}
 
 	// 连接数据库

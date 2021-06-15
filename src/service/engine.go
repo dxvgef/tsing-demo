@@ -64,12 +64,12 @@ func Start() (err error) {
 	// 启动http服务
 	if global.RuntimeConfig.Service.HTTPPort > 0 {
 		go func() {
-			log.Info().Str("addr", httpServer.Addr).Msg("启动HTTP服务")
+			log.Info().Str("监听地址", httpServer.Addr).Msg("启动HTTP服务")
 			if err = httpServer.ListenAndServe(); err != nil {
 				if err.Error() == http.ErrServerClosed.Error() {
 					log.Info().Msg("HTTP服务已关闭")
 				} else {
-					log.Err(err).Caller().Msg("启动HTTPS服务失败")
+					log.Err(err).Str("监听地址", httpServer.Addr).Caller().Msg("启动HTTP服务失败")
 				}
 				return
 			}
@@ -86,7 +86,7 @@ func Start() (err error) {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 
-	// 退出http服务
+	// 退出HTTP服务
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.RuntimeConfig.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if httpServer != nil {

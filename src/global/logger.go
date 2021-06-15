@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// 使用默认参数设置logger，用于没有读取到配置文件时替代标准包的log使用
+// 使用默认参数设置logger，用于没有读取配置时临时替代标准包的log使用
 func SetDefaultLogger() {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
@@ -80,6 +80,7 @@ func SetLogger() error {
 		}
 		logFile, err = os.OpenFile(RuntimeConfig.Logger.FilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, RuntimeConfig.Logger.FileMode)
 		if nil != err {
+			log.Err(err).Caller().Msg("无法访问日志文件")
 			return err
 		}
 	}
@@ -107,7 +108,9 @@ func SetLogger() error {
 			output = os.Stdout
 		}
 	default:
-		return errors.New("logger.encode配置参数值只支持json和console")
+		err = errors.New("logger.encode配置参数值只支持json和console")
+		log.Err(err).Caller().Msg("解析logger配置参数失败")
+		return err
 	}
 
 	log.Logger = log.Output(output)

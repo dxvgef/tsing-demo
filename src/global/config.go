@@ -114,7 +114,7 @@ var RuntimeConfig struct {
 func defaultConfig() {
 	// 环境变量
 	LaunchConfig.ConfigSource = LOCAL
-	LaunchConfig.Env = LOCAL
+	// LaunchConfig.Env = LOCAL
 	LaunchConfig.ServiceID = "tsing-demo"
 
 	// 服务默认配置
@@ -164,18 +164,18 @@ func LoadConfig() (err error) {
 
 	// 解析启动参数
 	flag.StringVar(&LaunchConfig.ConfigSource, "cfg", LaunchConfig.ConfigSource, "配置来源，可以是'local'表示本地或者配置中心地址'ip:port'，默认'local'")
-	flag.StringVar(&LaunchConfig.Env, "env", LaunchConfig.Env, "环境变量，默认'local'")
+	flag.StringVar(&LaunchConfig.Env, "env", LaunchConfig.Env, "环境变量，默认为空")
 	flag.Parse()
 
 	LaunchConfig.Env = strings.ToLower(LaunchConfig.Env)
 
-	log.Info().Str("cfg", LaunchConfig.ConfigSource).Str("env", LaunchConfig.Env).Str("sid", LaunchConfig.ServiceID).Msg("参数配置")
+	log.Info().Str("服务ID", LaunchConfig.ServiceID).Msg("内置变量")
+	log.Info().Str("配置来源(cfg)", LaunchConfig.ConfigSource).Str("环境变量(env)", LaunchConfig.Env).Msg("启动参数")
 
 	// 加载本地配置文件
 	if LaunchConfig.ConfigSource == LOCAL {
 		// 加载本地配置文件
 		if err = loadConfigFile(); err != nil {
-			log.Err(err).Caller().Send()
 			return err
 		}
 		return nil
@@ -191,8 +191,13 @@ func LoadConfig() (err error) {
 
 // 加载本地配置文件
 func loadConfigFile() error {
-	filePath := filepath.Clean("./config." + LaunchConfig.Env + ".toml")
-	file, err := os.Open(filePath)
+	var filePath string
+	if LaunchConfig.Env == "" {
+		filePath = "./config.toml"
+	} else {
+		filePath = filepath.Clean("./config." + LaunchConfig.Env + ".toml")
+	}
+	file, err := os.Open(filePath) // nolint:gosec
 	if err != nil {
 		log.Err(err).Caller().Str("path", filePath).Msg("无法读取本地配置文件")
 		return err
@@ -204,7 +209,7 @@ func loadConfigFile() error {
 		log.Err(err).Caller().Msg("解析本地配置文件失败")
 		return err
 	}
-	log.Info().Str("file", filePath).Msg("加载本地配置文件")
+	log.Info().Str("路径", filePath).Msg("加载本地配置文件")
 	return nil
 }
 
