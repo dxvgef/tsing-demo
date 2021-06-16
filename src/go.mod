@@ -3,12 +3,14 @@ module local
 go 1.16
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dxvgef/filter/v2 v2.3.0
 	github.com/dxvgef/sessions v1.0.3
 	github.com/dxvgef/tsing v1.6.0
 	github.com/dxvgef/tsing-center-go v0.0.5
 	github.com/go-pg/pg/v10 v10.10.0
 	github.com/pelletier/go-toml v1.9.3
+	github.com/rs/xid v1.3.0
 	github.com/rs/zerolog v1.23.0
 	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.0

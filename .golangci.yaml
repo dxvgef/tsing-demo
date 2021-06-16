@@ -188,6 +188,14 @@ issues:
         - gocritic
       text: "unnecessaryDefer:"
 
+    - linters:
+        - structcheck
+      text: "`tableName` is unused"
+
+    - linters:
+        - unused
+      text: "field `tableName` is unused"
+
     # Exclude lll issues for long lines with go:generate
   #    - linters:
   #        - lll

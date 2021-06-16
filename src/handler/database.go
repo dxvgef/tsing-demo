@@ -1,0 +1,61 @@
+package handler
+
+import (
+	"errors"
+
+	"local/global"
+
+	"github.com/dxvgef/tsing"
+	"github.com/go-pg/pg/v10"
+	"github.com/go-pg/pg/v10/orm"
+	"github.com/rs/xid"
+)
+
+type TestDatabase struct {
+	tableName struct{} `pg:"tsing"`
+	ID        int64    `pg:"id,pk"`
+	XID       string   `pg:"xid,notnull,unique"`
+}
+
+// 创建数据表
+func (*TestDatabase) CreateTable(ctx *tsing.Context) (err error) {
+	var model TestDatabase
+	if err = global.DB.Model(&model).CreateTable(&orm.CreateTableOptions{}); err != nil {
+		return ctx.Caller(err)
+	}
+	return ctx.Status(204)
+}
+
+// 写数据库
+func (*TestDatabase) Add(ctx *tsing.Context) (err error) {
+	var (
+		model  TestDatabase
+		result pg.Result
+	)
+	model.ID = global.SnowflakeNode.Generate().Int64()
+	model.XID = xid.New().String()
+	result, err = global.DB.Model(&model).Insert()
+	if err != nil {
+		return ctx.Caller(err)
+	}
+	if result.RowsAffected() == 0 {
+		return ctx.Caller(errors.New("写入数据失败"))
+	}
+	return ctx.Status(204)
+}
+
+// 读数据库
+func (*TestDatabase) Get(ctx *tsing.Context) (err error) {
+	var (
+		result   []TestDatabase
+		total    int
+		respData = make(map[string]interface{})
+	)
+	total, err = global.DB.Model(&TestDatabase{}).SelectAndCount(&result)
+	if err != nil {
+		return ctx.Caller(err)
+	}
+	respData["total"] = total
+	respData["rows"] = respData
+	return ctx.JSON(200, &respData)
+}

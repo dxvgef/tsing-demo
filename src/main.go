@@ -19,6 +19,11 @@ func main() {
 		return
 	}
 
+	// 设置snowflake
+	if err := global.SetSnowflake(); err != nil {
+		return
+	}
+
 	// 设置sessions
 	if err := global.SetSessions(); err != nil {
 		return
