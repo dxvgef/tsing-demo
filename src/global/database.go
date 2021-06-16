@@ -25,7 +25,7 @@ func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Co
 
 // AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
-	if !RuntimeConfig.Service.Debug {
+	if !RuntimeConfig.Debug {
 		return nil
 	}
 	// 记录SQL语句

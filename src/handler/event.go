@@ -31,12 +31,12 @@ func EventHandler(event *tsing.Event) {
 		}
 	case 500:
 		e := log.Error()
-		if global.RuntimeConfig.Service.Debug {
+		if global.RuntimeConfig.Debug {
 			e.Str("caller", " "+event.Source.File+":"+strconv.Itoa(event.Source.Line)+" ").
 				Str("func", event.Source.Func)
 		}
 
-		if global.RuntimeConfig.Service.Debug {
+		if global.RuntimeConfig.Debug {
 			var trace []string
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
@@ -48,7 +48,7 @@ func EventHandler(event *tsing.Event) {
 	}
 
 	responseMsg := ""
-	if global.RuntimeConfig.Service.Debug {
+	if global.RuntimeConfig.Debug {
 		responseMsg = event.Message.Error()
 	} else {
 		responseMsg = http.StatusText(event.Status)

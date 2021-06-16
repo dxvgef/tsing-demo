@@ -22,9 +22,9 @@ var httpServer *http.Server
 func Config() {
 	var config tsing.Config
 	config.EventHandler = handler.EventHandler
-	config.Recover = global.RuntimeConfig.Service.Recover
-	config.EventShortPath = global.RuntimeConfig.Service.EventShortPath
-	if global.RuntimeConfig.Service.Debug {
+	config.Recover = true
+	config.EventShortPath = true
+	if global.RuntimeConfig.Debug {
 		config.EventSource = true
 		config.EventTrace = true
 	}
@@ -40,7 +40,7 @@ func Config() {
 	setRouter()
 
 	// 如果是调试模式，注册pprof路由
-	if global.RuntimeConfig.Service.Debug {
+	if global.RuntimeConfig.Debug {
 		setDebugRouter()
 	}
 

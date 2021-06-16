@@ -25,25 +25,21 @@ var LaunchConfig struct {
 
 // 运行时配置
 var RuntimeConfig struct {
-	Common struct {
-	} `json:"common" toml:"common"`
+	Debug bool `json:"debug" toml:"debug"`
 
 	Service struct {
 		Secret                string `json:"secret" toml:"secret"`
 		IP                    string `json:"-" toml:"-"`
-		HTTPPort              uint16 `json:"http_port" toml:"http_port"`
-		HTTPSPort             uint16 `json:"https_port" toml:"https_port"`
 		ReadTimeout           uint   `json:"read_timeout" toml:"read_timeout"`
 		ReadHeaderTimeout     uint   `json:"read_header_timeout" toml:"read_header_timeout"`
 		WriteTimeout          uint   `json:"write_timeout" toml:"write_timeout"`
 		IdleTimeout           uint   `json:"idle_timeout" toml:"idle_timeout"`
 		QuitWaitTimeout       uint   `json:"quit_wait_timeout" toml:"quit_wait_timeout"`
+		HTTPPort              uint16 `json:"http_port" toml:"http_port"`
+		HTTPSPort             uint16 `json:"https_port" toml:"https_port"`
 		HTTP2                 bool   `json:"http2" toml:"http2"`
-		Debug                 bool   `json:"-" toml:"debug"`
 		EventNotFound         bool   `json:"event_not_found" toml:"event_not_found"`
 		EventMethodNotAllowed bool   `json:"event_method_not_allowed" toml:"event_method_not_allowed"`
-		Recover               bool   `json:"-" toml:"-"`
-		EventShortPath        bool   `json:"event_short_path" toml:"event_short_path"`
 	} `json:"service" toml:"service"`
 
 	Logger struct {
@@ -89,7 +85,7 @@ var RuntimeConfig struct {
 	} `json:"database" toml:"database"`
 
 	Session struct {
-		CookieName     string `json:"cookie_name" toml:"cookie_name"`
+		CookieKey      string `json:"cookie_key" toml:"cookie_key"`
 		RedisAddr      string `json:"redis_addr" toml:"redis_addr"`
 		RedisUsername  string `json:"redis_username" toml:"redis_username"`
 		RedisPassword  string `json:"redis_password" toml:"redis_password"`
@@ -118,21 +114,19 @@ func defaultConfig() {
 	LaunchConfig.ServiceID = "tsing-demo"
 
 	// 服务默认配置
+	RuntimeConfig.Debug = true
 	RuntimeConfig.Service.ReadTimeout = 10
 	RuntimeConfig.Service.ReadHeaderTimeout = 10
 	RuntimeConfig.Service.WriteTimeout = 10
 	RuntimeConfig.Service.IdleTimeout = 10
 	RuntimeConfig.Service.QuitWaitTimeout = 5
-	RuntimeConfig.Service.Debug = true
 	RuntimeConfig.Service.HTTPPort = 80
-	RuntimeConfig.Service.Recover = true
 	RuntimeConfig.Service.EventNotFound = true
 	RuntimeConfig.Service.EventMethodNotAllowed = true
-	RuntimeConfig.Service.EventShortPath = true
 
 	// 日志默认配置
 	RuntimeConfig.Logger.Level = "debug"
-	RuntimeConfig.Logger.FileMode = 600
+	RuntimeConfig.Logger.FileMode = 0600
 	RuntimeConfig.Logger.Encode = "console"
 	RuntimeConfig.Logger.TimeFormat = "y-m-d h:i:s"
 
@@ -149,7 +143,7 @@ func defaultConfig() {
 	RuntimeConfig.Database.PoolSize = 200
 
 	// session默认配置
-	RuntimeConfig.Session.CookieName = "sessionid"
+	RuntimeConfig.Session.CookieKey = "sessionid"
 	RuntimeConfig.Session.IdleTimeout = 40 * 60
 
 	// redis默认配置

@@ -36,30 +36,36 @@ func FormatTime(str string) string {
 }
 
 // 设置logger
-func SetLogger() error {
+func SetLogger() (err error) {
+	var (
+		output  io.Writer
+		logFile *os.File
+	)
+
 	// 设置级别
-	level := strings.ToLower(RuntimeConfig.Logger.Level)
-	if RuntimeConfig.Service.Debug {
+	RuntimeConfig.Logger.Level = strings.ToLower(RuntimeConfig.Logger.Level)
+	// 如果是debug模式，则日志记录自动为debug级别
+	if RuntimeConfig.Debug {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	} else {
-		switch level {
+		switch RuntimeConfig.Logger.Level {
+		case "debug":
+			zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		case "info":
 			zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		case "warn":
 			zerolog.SetGlobalLevel(zerolog.WarnLevel)
 		case "error":
 			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		case "empty":
-			zerolog.SetGlobalLevel(zerolog.NoLevel)
-		case "debug":
-			zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		default:
-			zerolog.SetGlobalLevel(zerolog.Disabled)
-			return nil
+			err = errors.New("logger.level配置参数值无效")
+			log.Err(err).Str("logger.level", RuntimeConfig.Logger.Level).Msg(err.Error())
+			return err
 		}
 	}
 
 	// 设置时间格式
+	RuntimeConfig.Logger.TimeFormat = strings.ToLower(RuntimeConfig.Logger.TimeFormat)
 	if RuntimeConfig.Logger.TimeFormat == "timestamp" {
 		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	} else {
@@ -67,25 +73,19 @@ func SetLogger() error {
 	}
 
 	// 设置日志输出方式
-	var (
-		output  io.Writer
-		logFile *os.File
-		err     error
-	)
-	// 设置日志文件
+	// 输出到日志文件，否则默认是输出到控制台
 	if RuntimeConfig.Logger.FilePath != "" {
-		// 输出到文件
-		if RuntimeConfig.Logger.FileMode == 0 {
-			RuntimeConfig.Logger.FileMode = os.FileMode(0600)
-		}
+		// 打开文件
 		logFile, err = os.OpenFile(RuntimeConfig.Logger.FilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, RuntimeConfig.Logger.FileMode)
 		if nil != err {
 			log.Err(err).Caller().Msg("无法访问日志文件")
 			return err
 		}
 	}
+
+	// 设置日志编码格式
+	RuntimeConfig.Logger.Encode = strings.ToLower(RuntimeConfig.Logger.Encode)
 	switch RuntimeConfig.Logger.Encode {
-	// console编码
 	case "console":
 		if logFile != nil {
 			output = zerolog.ConsoleWriter{
@@ -109,7 +109,7 @@ func SetLogger() error {
 		}
 	default:
 		err = errors.New("logger.encode配置参数值只支持json和console")
-		log.Err(err).Caller().Msg("解析logger配置参数失败")
+		log.Err(err).Caller().Msg("解析logger配置参数值失败")
 		return err
 	}
 

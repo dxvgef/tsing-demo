@@ -26,7 +26,7 @@ func SetSessions() (err error) {
 
 	// 创建引擎
 	if Sessions, err = sessions.New(&sessions.Config{
-		Key:         RuntimeConfig.Session.CookieName,
+		Key:         RuntimeConfig.Session.CookieKey,
 		HTTPOnly:    RuntimeConfig.Session.HTTPOnly,
 		Secure:      RuntimeConfig.Session.Secure,
 		Path:        "/",
