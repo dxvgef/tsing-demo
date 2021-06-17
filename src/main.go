@@ -26,7 +26,7 @@ func main() {
 		return
 	}
 
-	// 设置RSA私钥
+	// 创建RSA密钥
 	if err = global.MakeRSAKey(); err != nil {
 		return
 	}
