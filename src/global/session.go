@@ -14,11 +14,11 @@ func SetSessions() (err error) {
 	// 创建存储器
 	var storage sessions.Storage
 	if storage, err = redis.New(&redis.Config{
-		Addr:     RuntimeConfig.Session.RedisAddr,
-		Username: RuntimeConfig.Session.RedisUsername,
-		Password: RuntimeConfig.Session.RedisPassword,
-		Prefix:   RuntimeConfig.Session.RedisKeyPrefix,
-		DB:       RuntimeConfig.Session.RedisDB,
+		Addr:     Config.Session.RedisAddr,
+		Username: Config.Session.RedisUsername,
+		Password: Config.Session.RedisPassword,
+		Prefix:   Config.Session.RedisKeyPrefix,
+		DB:       Config.Session.RedisDB,
 	}); err != nil {
 		log.Err(err).Caller().Msg("Session存储器配置失败")
 		return
@@ -26,11 +26,11 @@ func SetSessions() (err error) {
 
 	// 创建引擎
 	if Sessions, err = sessions.New(&sessions.Config{
-		Key:         RuntimeConfig.Session.CookieKey,
-		HTTPOnly:    RuntimeConfig.Session.HTTPOnly,
-		Secure:      RuntimeConfig.Session.Secure,
+		Key:         Config.Session.CookieKey,
+		HTTPOnly:    Config.Session.HTTPOnly,
+		Secure:      Config.Session.Secure,
 		Path:        "/",
-		IdleTimeout: RuntimeConfig.Session.IdleTimeout, // 空闲超时时间(秒)
+		IdleTimeout: Config.Session.IdleTimeout, // 空闲超时时间(秒)
 	}, storage); err != nil {
 		log.Err(err).Caller().Msg("Session引擎配置失败")
 		return

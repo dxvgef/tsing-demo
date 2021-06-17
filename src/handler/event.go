@@ -18,25 +18,25 @@ func EventHandler(event *tsing.Event) {
 	// 根据状态码做不同的日志处理
 	switch event.Status {
 	case 404:
-		if global.RuntimeConfig.Service.EventNotFound {
+		if global.Config.Service.EventNotFound {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(http.StatusNotFound))
 		}
 	case 405:
-		if global.RuntimeConfig.Service.EventMethodNotAllowed {
+		if global.Config.Service.EventMethodNotAllowed {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(http.StatusMethodNotAllowed))
 		}
 	case 500:
 		e := log.Error()
-		if global.RuntimeConfig.Debug {
+		if global.Config.Debug {
 			e.Str("caller", " "+event.Source.File+":"+strconv.Itoa(event.Source.Line)+" ").
 				Str("func", event.Source.Func)
 		}
 
-		if global.RuntimeConfig.Debug {
+		if global.Config.Debug {
 			var trace []string
 			for k := range event.Trace {
 				trace = append(trace, event.Trace[k])
@@ -48,7 +48,7 @@ func EventHandler(event *tsing.Event) {
 	}
 
 	responseMsg := ""
-	if global.RuntimeConfig.Debug {
+	if global.Config.Debug {
 		responseMsg = event.Message.Error()
 	} else {
 		responseMsg = http.StatusText(event.Status)

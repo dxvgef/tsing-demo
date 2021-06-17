@@ -24,7 +24,7 @@ func Config() {
 	config.EventHandler = handler.EventHandler
 	config.Recover = true
 	config.EventShortPath = true
-	if global.RuntimeConfig.Debug {
+	if global.Config.Debug {
 		config.EventSource = true
 		config.EventTrace = true
 	}
@@ -40,19 +40,19 @@ func Config() {
 	setRouter()
 
 	// 如果是调试模式，注册pprof路由
-	if global.RuntimeConfig.Debug {
+	if global.Config.Debug {
 		setDebugRouter()
 	}
 
 	// 设置HTTP服务
-	if global.RuntimeConfig.Service.HTTPPort > 0 {
+	if global.Config.Service.HTTPPort > 0 {
 		httpServer = &http.Server{
-			Addr:              global.RuntimeConfig.Service.IP + ":" + strconv.FormatUint(uint64(global.RuntimeConfig.Service.HTTPPort), 10),
-			Handler:           engine,                                                                      // 调度器
-			ReadTimeout:       time.Duration(global.RuntimeConfig.Service.ReadTimeout) * time.Second,       // 读取超时
-			WriteTimeout:      time.Duration(global.RuntimeConfig.Service.WriteTimeout) * time.Second,      // 响应超时
-			IdleTimeout:       time.Duration(global.RuntimeConfig.Service.IdleTimeout) * time.Second,       // 连接空闲超时
-			ReadHeaderTimeout: time.Duration(global.RuntimeConfig.Service.ReadHeaderTimeout) * time.Second, // http header读取超时
+			Addr:              global.Config.Service.IP + ":" + strconv.FormatUint(uint64(global.Config.Service.HTTPPort), 10),
+			Handler:           engine,                                                               // 调度器
+			ReadTimeout:       time.Duration(global.Config.Service.ReadTimeout) * time.Second,       // 读取超时
+			WriteTimeout:      time.Duration(global.Config.Service.WriteTimeout) * time.Second,      // 响应超时
+			IdleTimeout:       time.Duration(global.Config.Service.IdleTimeout) * time.Second,       // 连接空闲超时
+			ReadHeaderTimeout: time.Duration(global.Config.Service.ReadHeaderTimeout) * time.Second, // http header读取超时
 		}
 	}
 }
@@ -62,7 +62,7 @@ func Start() (err error) {
 	Config()
 
 	// 启动http服务
-	if global.RuntimeConfig.Service.HTTPPort > 0 {
+	if global.Config.Service.HTTPPort > 0 {
 		go func() {
 			log.Info().Str("监听地址", httpServer.Addr).Msg("启动HTTP服务")
 			if err = httpServer.ListenAndServe(); err != nil {
@@ -77,7 +77,7 @@ func Start() (err error) {
 	}
 
 	// 设置服务中心
-	if global.RuntimeConfig.ServiceCenter.Addr != "" {
+	if global.Config.ServiceCenter.Addr != "" {
 		go SetCenter()
 	}
 
@@ -87,7 +87,7 @@ func Start() (err error) {
 	<-quit
 
 	// 退出HTTP服务
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.RuntimeConfig.Service.QuitWaitTimeout)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(global.Config.Service.QuitWaitTimeout)*time.Second)
 	defer cancel()
 	if httpServer != nil {
 		if err = httpServer.Shutdown(ctx); err != nil {

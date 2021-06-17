@@ -25,7 +25,7 @@ func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Co
 
 // AfterQuery 查询后钩子
 func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
-	if !RuntimeConfig.Debug {
+	if !Config.Debug {
 		return nil
 	}
 	// 记录SQL语句
@@ -46,17 +46,17 @@ func SetDatabase() (err error) {
 		return nil
 	}
 	// 读取配置文件
-	if RuntimeConfig.Database.Addr == "" {
+	if Config.Database.Addr == "" {
 		err = errors.New("配置文件[database]节点的addr参数不正确")
 		log.Err(err).Caller().Msg("数据库配置失败")
 		return
 	}
-	if RuntimeConfig.Database.User == "" {
+	if Config.Database.User == "" {
 		err = errors.New("配置文件[database]节点的user参数不正确")
 		log.Err(err).Caller().Msg("数据库配置失败")
 		return
 	}
-	if RuntimeConfig.Database.Name == "" {
+	if Config.Database.Name == "" {
 		err = errors.New("配置文件[database]节点的name参数不正确")
 		log.Err(err).Caller().Msg("数据库配置失败")
 		return
@@ -64,14 +64,14 @@ func SetDatabase() (err error) {
 
 	// 连接数据库
 	DB = pg.Connect(&pg.Options{
-		Addr:         RuntimeConfig.Database.Addr,
-		User:         RuntimeConfig.Database.User,
-		Password:     RuntimeConfig.Database.Password,
-		Database:     RuntimeConfig.Database.Name,
-		DialTimeout:  time.Duration(RuntimeConfig.Database.DialTimeout) * time.Second,
-		ReadTimeout:  time.Duration(RuntimeConfig.Database.ReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(RuntimeConfig.Database.WriteTimeout) * time.Second,
-		PoolSize:     int(RuntimeConfig.Database.PoolSize),
+		Addr:         Config.Database.Addr,
+		User:         Config.Database.User,
+		Password:     Config.Database.Password,
+		Database:     Config.Database.Name,
+		DialTimeout:  time.Duration(Config.Database.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(Config.Database.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(Config.Database.WriteTimeout) * time.Second,
+		PoolSize:     int(Config.Database.PoolSize),
 	})
 
 	// 注册钩子

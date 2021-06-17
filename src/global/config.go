@@ -16,15 +16,15 @@ import (
 
 const LOCAL = "local"
 
-// 启动配置
-var LaunchConfig struct {
+// 启动参数
+var LaunchFlag struct {
 	ConfigSource string // 配置来源(local或者服务中心地址'127.0.0.1:10000')
 	Env          string // 环境变量
 	ServiceID    string // 服务ID
 }
 
 // 运行时配置
-var RuntimeConfig struct {
+var Config struct {
 	Debug bool `json:"debug" toml:"debug"`
 
 	Service struct {
@@ -109,46 +109,46 @@ var RuntimeConfig struct {
 // 设置本地默认配置
 func defaultConfig() {
 	// 环境变量
-	LaunchConfig.ConfigSource = LOCAL
-	// LaunchConfig.Env = LOCAL
-	LaunchConfig.ServiceID = "tsing-demo"
+	LaunchFlag.ConfigSource = LOCAL
+	// LaunchFlag.Env = LOCAL
+	LaunchFlag.ServiceID = "tsing-demo"
 
 	// 服务默认配置
-	RuntimeConfig.Debug = true
-	RuntimeConfig.Service.ReadTimeout = 10
-	RuntimeConfig.Service.ReadHeaderTimeout = 10
-	RuntimeConfig.Service.WriteTimeout = 10
-	RuntimeConfig.Service.IdleTimeout = 10
-	RuntimeConfig.Service.QuitWaitTimeout = 5
-	RuntimeConfig.Service.HTTPPort = 80
-	RuntimeConfig.Service.EventNotFound = true
-	RuntimeConfig.Service.EventMethodNotAllowed = true
+	Config.Debug = true
+	Config.Service.ReadTimeout = 10
+	Config.Service.ReadHeaderTimeout = 10
+	Config.Service.WriteTimeout = 10
+	Config.Service.IdleTimeout = 10
+	Config.Service.QuitWaitTimeout = 5
+	Config.Service.HTTPPort = 80
+	Config.Service.EventNotFound = true
+	Config.Service.EventMethodNotAllowed = true
 
 	// 日志默认配置
-	RuntimeConfig.Logger.Level = "debug"
-	RuntimeConfig.Logger.FileMode = 0600
-	RuntimeConfig.Logger.Encode = "console"
-	RuntimeConfig.Logger.TimeFormat = "y-m-d h:i:s"
+	Config.Logger.Level = "debug"
+	Config.Logger.FileMode = 0600
+	Config.Logger.Encode = "console"
+	Config.Logger.TimeFormat = "y-m-d h:i:s"
 
 	// etcd默认配置
-	RuntimeConfig.Etcd.Endpoints = []string{"http://127.0.0.1:2379"}
-	RuntimeConfig.Etcd.DialTimeout = 5
+	Config.Etcd.Endpoints = []string{"http://127.0.0.1:2379"}
+	Config.Etcd.DialTimeout = 5
 
 	// 数据库默认配置
-	RuntimeConfig.Database.Addr = "127.0.0.1:5432"
-	RuntimeConfig.Database.User = "postgres"
-	RuntimeConfig.Database.DialTimeout = 5
-	RuntimeConfig.Database.ReadTimeout = 10
-	RuntimeConfig.Database.WriteTimeout = 10
-	RuntimeConfig.Database.PoolSize = 200
+	Config.Database.Addr = "127.0.0.1:5432"
+	Config.Database.User = "postgres"
+	Config.Database.DialTimeout = 5
+	Config.Database.ReadTimeout = 10
+	Config.Database.WriteTimeout = 10
+	Config.Database.PoolSize = 200
 
 	// session默认配置
-	RuntimeConfig.Session.CookieKey = "sessionid"
-	RuntimeConfig.Session.IdleTimeout = 40 * 60
+	Config.Session.CookieKey = "sessionid"
+	Config.Session.IdleTimeout = 40 * 60
 
 	// redis默认配置
-	RuntimeConfig.Redis.Addr = "127.0.0.1:6379"
-	RuntimeConfig.Redis.KeyPrefix = "sess_"
+	Config.Redis.Addr = "127.0.0.1:6379"
+	Config.Redis.KeyPrefix = "sess_"
 }
 
 // 加载配置
@@ -157,17 +157,17 @@ func LoadConfig() (err error) {
 	defaultConfig()
 
 	// 解析启动参数
-	flag.StringVar(&LaunchConfig.ConfigSource, "cfg", LaunchConfig.ConfigSource, "配置来源，可以是'local'表示本地或者配置中心地址'ip:port'，默认'local'")
-	flag.StringVar(&LaunchConfig.Env, "env", LaunchConfig.Env, "环境变量，默认为空")
+	flag.StringVar(&LaunchFlag.ConfigSource, "cfg", LaunchFlag.ConfigSource, "配置来源，可以是'local'表示本地或者配置中心地址'ip:port'，默认'local'")
+	flag.StringVar(&LaunchFlag.Env, "env", LaunchFlag.Env, "环境变量，默认为空")
 	flag.Parse()
 
-	LaunchConfig.Env = strings.ToLower(LaunchConfig.Env)
+	LaunchFlag.Env = strings.ToLower(LaunchFlag.Env)
 
-	log.Info().Str("服务ID", LaunchConfig.ServiceID).Msg("内置变量")
-	log.Info().Str("配置来源(cfg)", LaunchConfig.ConfigSource).Str("环境变量(env)", LaunchConfig.Env).Msg("启动参数")
+	log.Info().Str("服务ID", LaunchFlag.ServiceID).Msg("内置变量")
+	log.Info().Str("配置来源(cfg)", LaunchFlag.ConfigSource).Str("环境变量(env)", LaunchFlag.Env).Msg("启动参数")
 
 	// 加载本地配置文件
-	if LaunchConfig.ConfigSource == LOCAL {
+	if LaunchFlag.ConfigSource == LOCAL {
 		// 加载本地配置文件
 		if err = loadConfigFile(); err != nil {
 			return err
@@ -186,10 +186,10 @@ func LoadConfig() (err error) {
 // 加载本地配置文件
 func loadConfigFile() error {
 	var filePath string
-	if LaunchConfig.Env == "" {
+	if LaunchFlag.Env == "" {
 		filePath = "./config.toml"
 	} else {
-		filePath = filepath.Clean("./config." + LaunchConfig.Env + ".toml")
+		filePath = filepath.Clean("./config." + LaunchFlag.Env + ".toml")
 	}
 	file, err := os.Open(filePath) // nolint:gosec
 	if err != nil {
@@ -198,7 +198,7 @@ func loadConfigFile() error {
 	}
 
 	// 解析配置文件到Config
-	err = toml.NewDecoder(file).Decode(&RuntimeConfig)
+	err = toml.NewDecoder(file).Decode(&Config)
 	if err != nil {
 		log.Err(err).Caller().Msg("解析本地配置文件失败")
 		return err
@@ -221,10 +221,10 @@ func loadRemoteConfig() (err error) {
 		}
 	}
 	key.WriteString("/")
-	key.WriteString(LaunchConfig.ServiceID)
+	key.WriteString(LaunchFlag.ServiceID)
 	key.WriteString("/")
-	key.WriteString(LaunchConfig.Env)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(RuntimeConfig.Etcd.DialTimeout)*time.Second)
+	key.WriteString(LaunchFlag.Env)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(Config.Etcd.DialTimeout)*time.Second)
 	defer cancel()
 	// 取出前缀下的所有的key
 	if resp, err = EtcdCli.Get(ctx, key.String(), clientv3.WithPrefix()); err != nil {
@@ -236,21 +236,21 @@ func loadRemoteConfig() (err error) {
 		remoteKey := string(resp.Kvs[k].Key)
 		// 加载公用配置
 		if remoteKey == key.String() {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &RuntimeConfig); err != nil {
+			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
 				log.Err(err).Caller().Send()
 				return err
 			}
 			log.Info().Str("Key", remoteKey).Msg("加载远程公用配置成功")
 		}
 		// 加载定制配置
-		if strings.HasPrefix(remoteKey, key.String()+"/"+LaunchConfig.ServiceID) {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &RuntimeConfig); err != nil {
+		if strings.HasPrefix(remoteKey, key.String()+"/"+LaunchFlag.ServiceID) {
+			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
 				log.Err(err).Caller().Send()
 				return err
 			}
 			log.Info().Str("Key", remoteKey).Msg("加载远程定制配置成功")
 		}
 	}
-	log.Info().Strs("etcd", RuntimeConfig.Etcd.Endpoints).Msg("远程配置加载")
+	log.Info().Strs("etcd", Config.Etcd.Endpoints).Msg("远程配置加载")
 	return nil
 }

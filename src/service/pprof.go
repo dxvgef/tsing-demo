@@ -13,8 +13,8 @@ import (
 // pprof路由
 func setDebugRouter() {
 	// 如果此值小于60秒则pprof的profile功能将一直写超时
-	if global.RuntimeConfig.Service.WriteTimeout < 120 {
-		global.RuntimeConfig.Service.WriteTimeout = 120
+	if global.Config.Service.WriteTimeout < 120 {
+		global.Config.Service.WriteTimeout = 120
 	}
 	router := engine.Group("/debug/pprof")
 	router.GET("/", indexHandler)
