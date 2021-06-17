@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dxvgef/filter/v2 v2.3.0
+	github.com/dxvgef/rsalib v1.0.1
 	github.com/dxvgef/sessions v1.0.3
 	github.com/dxvgef/tsing v1.6.0
 	github.com/dxvgef/tsing-center-go v0.0.5

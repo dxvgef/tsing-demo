@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
 	"time"
 
 	"local/global"
@@ -17,20 +15,18 @@ type JWTHandler struct {
 	jwt.Claims
 }
 
-var privateKey *rsa.PrivateKey
-
 // 验证JWT
 func (*JWTHandler) Auth(ctx *tsing.Context) error {
 	tokenStr := ctx.Query("token")
 	if tokenStr == "" {
 		return ctx.Status(400)
 	}
-	if privateKey == nil {
-		return ctx.String(500, "私钥没有创建")
-	}
-	claims, err := jwt.RSACheck([]byte(tokenStr), &privateKey.PublicKey)
+	claims, err := jwt.RSACheck([]byte(tokenStr), global.PrivateKey.GetPublicKey().ToRaw())
 	if err != nil {
 		return ctx.Caller(err)
+	}
+	if !claims.Valid(time.Now()) {
+		return ctx.Status(401)
 	}
 	return ctx.JSON(200, &claims)
 }
@@ -41,19 +37,12 @@ func (*JWTHandler) Sign(ctx *tsing.Context) (err error) {
 		tokenBytes []byte
 		claims     JWTHandler
 	)
-	// 生成私钥文件
-	if privateKey == nil {
-		privateKey, err = rsa.GenerateKey(rand.Reader, 2048)
-		if err != nil {
-			return ctx.Caller(err)
-		}
-	}
 
 	claims.UserID = global.SnowflakeNode.Generate().Int64()
 	claims.Nickname = "dxvgef"
 	claims.Expires = jwt.NewNumericTime(time.Now().Add(10 * time.Minute))
 
-	tokenBytes, err = claims.RSASign(jwt.RS256, privateKey)
+	tokenBytes, err = claims.RSASign(jwt.RS256, global.PrivateKey.ToRaw())
 	if err != nil {
 		return ctx.Caller(err)
 	}
