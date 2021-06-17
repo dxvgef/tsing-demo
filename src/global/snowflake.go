@@ -11,6 +11,8 @@ var SnowflakeNode *snowflake.Node
 // 设置snowflake节点
 func SetSnowflake() (err error) {
 	SnowflakeNode, err = snowflake.NewNode(0)
-	log.Err(err).Caller().Msg("设置snowflake节点失败")
+	if err != nil {
+		log.Err(err).Caller().Msg("设置snowflake节点失败")
+	}
 	return
 }

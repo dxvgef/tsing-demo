@@ -159,9 +159,15 @@ issues:
     - linters:
         - golint
       text: "should have comment"
+
     - linters:
         - govet
       text: "fieldalignment:"
+
+    - linters:
+        - govet
+      text: "unusedwrite: unused write to field"
+
     # 排除stylecheck的导出未注释的消息
     - linters:
         - stylecheck

@@ -11,25 +11,23 @@ import (
 	"github.com/rs/xid"
 )
 
-type TestDatabase struct {
+type DatabaseHandler struct {
 	tableName struct{} `pg:"tsing"`
 	ID        int64    `pg:"id,pk"`
 	XID       string   `pg:"xid,notnull,unique"`
 }
 
 // 创建数据表
-func (*TestDatabase) CreateTable(ctx *tsing.Context) (err error) {
-	var model TestDatabase
-	if err = global.DB.Model(&model).CreateTable(&orm.CreateTableOptions{}); err != nil {
+func (*DatabaseHandler) CreateTable(ctx *tsing.Context) (err error) {
+	if err = global.DB.Model(&DatabaseHandler{}).CreateTable(&orm.CreateTableOptions{}); err != nil {
 		return ctx.Caller(err)
 	}
 	return ctx.Status(204)
 }
 
-// 写数据库
-func (*TestDatabase) Add(ctx *tsing.Context) (err error) {
+// 写数据
+func (model DatabaseHandler) Add(ctx *tsing.Context) (err error) {
 	var (
-		model  TestDatabase
 		result pg.Result
 	)
 	model.ID = global.SnowflakeNode.Generate().Int64()
@@ -44,18 +42,26 @@ func (*TestDatabase) Add(ctx *tsing.Context) (err error) {
 	return ctx.Status(204)
 }
 
-// 读数据库
-func (*TestDatabase) Get(ctx *tsing.Context) (err error) {
+// 读数据
+func (*DatabaseHandler) Get(ctx *tsing.Context) (err error) {
 	var (
-		result   []TestDatabase
+		result   []DatabaseHandler
 		total    int
 		respData = make(map[string]interface{})
 	)
-	total, err = global.DB.Model(&TestDatabase{}).SelectAndCount(&result)
+	total, err = global.DB.Model(&DatabaseHandler{}).SelectAndCount(&result)
 	if err != nil {
 		return ctx.Caller(err)
 	}
 	respData["total"] = total
 	respData["rows"] = respData
 	return ctx.JSON(200, &respData)
+}
+
+// 删除数据
+func (model DatabaseHandler) Delete(ctx *tsing.Context) (err error) {
+	if err = global.DB.Model(&model).DropTable(&orm.DropTableOptions{}); err != nil {
+		return ctx.Caller(err)
+	}
+	return ctx.Status(204)
 }

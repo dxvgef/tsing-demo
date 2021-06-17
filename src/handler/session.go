@@ -8,10 +8,10 @@ import (
 	"github.com/dxvgef/tsing"
 )
 
-type TestSession struct{}
+type SessionHandler struct{}
 
 // 写session
-func (*TestSession) Put(ctx *tsing.Context) error {
+func (*SessionHandler) Put(ctx *tsing.Context) error {
 	var (
 		err   error
 		key   string
@@ -38,7 +38,7 @@ func (*TestSession) Put(ctx *tsing.Context) error {
 }
 
 // 读session
-func (*TestSession) Get(ctx *tsing.Context) (err error) {
+func (*SessionHandler) Get(ctx *tsing.Context) (err error) {
 	var (
 		sess  *sessions.Session
 		key   string
@@ -60,7 +60,7 @@ func (*TestSession) Get(ctx *tsing.Context) (err error) {
 }
 
 // 销毁session
-func (*TestSession) Destroy(ctx *tsing.Context) (err error) {
+func (*SessionHandler) Destroy(ctx *tsing.Context) (err error) {
 	var sess *sessions.Session
 	sess, err = global.Sessions.Use(ctx.Request, ctx.ResponseWriter)
 	if err != nil {
