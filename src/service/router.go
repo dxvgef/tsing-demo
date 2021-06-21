@@ -27,6 +27,11 @@ func setRouter() {
 	jwtRouter.POST("/", jwtHandler.Sign)
 	jwtRouter.GET("/", jwtHandler.Auth)
 
+	var redisHandler handler.RedisHandler
+	redisRouter := engine.Group("/redis")
+	redisRouter.POST("/", redisHandler.Set)
+	redisRouter.GET("/:key", redisHandler.Get)
+
 	// 定义路由组，同时注册一个处理器做为中间件
 	// secretRouter := engine.Group("/secret", handler.Auth)
 }
