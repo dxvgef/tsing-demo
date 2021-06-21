@@ -10,6 +10,7 @@ require (
 	github.com/dxvgef/tsing v1.6.0
 	github.com/dxvgef/tsing-center-go v0.0.5
 	github.com/go-pg/pg/v10 v10.10.0
+	github.com/go-redis/redis/v8 v8.10.0
 	github.com/pascaldekloe/jwt v1.10.0
 	github.com/pelletier/go-toml v1.9.3
 	github.com/rs/xid v1.3.0

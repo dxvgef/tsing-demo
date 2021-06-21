@@ -1,6 +1,9 @@
 package global
 
 import (
+	"errors"
+	"net"
+
 	"github.com/dxvgef/sessions"
 	"github.com/dxvgef/sessions/storage/redis"
 	"github.com/rs/zerolog/log"
@@ -11,6 +14,15 @@ var Sessions *sessions.Engine
 
 // SetSessions 设置session引擎
 func SetSessions() (err error) {
+	if _, err = net.ResolveTCPAddr("tcp", Config.Session.RedisAddr); err != nil {
+		log.Err(err).Caller().Str("addr", Config.Session.RedisAddr).Msg("Session存储器配置失败")
+		return
+	}
+	if Config.Session.RedisDB > 16 {
+		err = errors.New("库索引号不能大于16")
+		log.Err(err).Caller().Uint8("db", Config.Session.RedisDB).Msg("Session存储器配置失败")
+		return
+	}
 	// 创建存储器
 	var storage sessions.Storage
 	if storage, err = redis.New(&redis.Config{

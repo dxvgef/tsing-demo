@@ -1,17 +1,14 @@
 package global
 
 import (
-	"context"
-	"encoding/json"
+	"errors"
 	"flag"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/pelletier/go-toml"
 	"github.com/rs/zerolog/log"
-	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 const LOCAL = "local"
@@ -20,12 +17,12 @@ const LOCAL = "local"
 var LaunchFlag struct {
 	ConfigSource string // 配置来源(local或者服务中心地址'127.0.0.1:10000')
 	Env          string // 环境变量
-	ServiceID    string // 服务ID
 }
 
 // 运行时配置
 var Config struct {
-	Debug bool `json:"debug" toml:"debug"`
+	Debug     bool   `json:"-" toml:"-"`
+	ServiceID string `toml:"-" json:"-"` // 服务ID
 
 	Service struct {
 		Secret                string `json:"secret" toml:"secret"`
@@ -67,7 +64,7 @@ var Config struct {
 
 	Redis struct {
 		Addr      string `json:"addr" toml:"addr"`
-		DB        int    `json:"db" toml:"db"`
+		DB        uint8  `json:"db" toml:"db"`
 		Username  string `json:"username" toml:"username"`
 		Password  string `json:"password" toml:"password"`
 		KeyPrefix string `json:"key_prefix" toml:"key_prefix"`
@@ -111,7 +108,7 @@ func defaultConfig() {
 	// 环境变量
 	LaunchFlag.ConfigSource = LOCAL
 	// LaunchFlag.Env = LOCAL
-	LaunchFlag.ServiceID = "tsing-demo"
+	// LaunchFlag.ServiceID = ""
 
 	// 服务默认配置
 	Config.Debug = true
@@ -145,10 +142,10 @@ func defaultConfig() {
 	// session默认配置
 	Config.Session.CookieKey = "sessionid"
 	Config.Session.IdleTimeout = 40 * 60
+	Config.Session.RedisKeyPrefix = "sess_"
 
 	// redis默认配置
 	Config.Redis.Addr = "127.0.0.1:6379"
-	Config.Redis.KeyPrefix = "sess_"
 }
 
 // 加载配置
@@ -163,94 +160,51 @@ func LoadConfig() (err error) {
 
 	LaunchFlag.Env = strings.ToLower(LaunchFlag.Env)
 
-	log.Info().Str("服务ID", LaunchFlag.ServiceID).Msg("内置变量")
+	log.Info().Str("服务ID", Config.ServiceID).Msg("内置变量")
 	log.Info().Str("配置来源(cfg)", LaunchFlag.ConfigSource).Str("环境变量(env)", LaunchFlag.Env).Msg("启动参数")
 
 	// 加载本地配置文件
 	if LaunchFlag.ConfigSource == LOCAL {
 		// 加载本地配置文件
-		if err = loadConfigFile(); err != nil {
-			return err
-		}
-		return nil
+		return loadConfigFile()
 	}
-
-	// 加载远程配置
-	if err = loadRemoteConfig(); err != nil {
-		log.Err(err).Caller().Send()
-		return err
-	}
-	return nil
+	return
 }
 
 // 加载本地配置文件
-func loadConfigFile() error {
-	var filePath string
+func loadConfigFile() (err error) {
+	var (
+		filePath string
+		file     *os.File
+	)
 	if LaunchFlag.Env == "" {
 		filePath = "./config.toml"
 	} else {
 		filePath = filepath.Clean("./config." + LaunchFlag.Env + ".toml")
 	}
-	file, err := os.Open(filePath) // nolint:gosec
+	file, err = os.Open(filePath) // nolint:gosec
 	if err != nil {
-		log.Err(err).Caller().Str("path", filePath).Msg("无法读取本地配置文件")
-		return err
+		log.Err(err).Caller().Str("path", filePath).Send()
+		return
 	}
 
 	// 解析配置文件到Config
 	err = toml.NewDecoder(file).Decode(&Config)
 	if err != nil {
-		log.Err(err).Caller().Msg("解析本地配置文件失败")
-		return err
-	}
-	log.Info().Str("路径", filePath).Msg("加载本地配置文件")
-	return nil
-}
-
-// 加载远程配置
-func loadRemoteConfig() (err error) {
-	var (
-		resp *clientv3.GetResponse
-		key  strings.Builder
-	)
-	// 实例化etcd客户端
-	if EtcdCli == nil {
-		if err = SetEtcdCli(); err != nil {
-			log.Err(err).Caller().Msg("设置etcd客户端失败")
-			return err
-		}
-	}
-	key.WriteString("/")
-	key.WriteString(LaunchFlag.ServiceID)
-	key.WriteString("/")
-	key.WriteString(LaunchFlag.Env)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(Config.Etcd.DialTimeout)*time.Second)
-	defer cancel()
-	// 取出前缀下的所有的key
-	if resp, err = EtcdCli.Get(ctx, key.String(), clientv3.WithPrefix()); err != nil {
 		log.Err(err).Caller().Send()
 		return
 	}
-	// 遍历key来加载配置
-	for k := range resp.Kvs {
-		remoteKey := string(resp.Kvs[k].Key)
-		// 加载公用配置
-		if remoteKey == key.String() {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
-				log.Err(err).Caller().Send()
-				return err
-			}
-			log.Info().Str("Key", remoteKey).Msg("加载远程公用配置成功")
-		}
-		// 加载定制配置
-		if strings.HasPrefix(remoteKey, key.String()+"/"+LaunchFlag.ServiceID) {
-			if err = json.Unmarshal(resp.Kvs[k].Value, &Config); err != nil {
-				log.Err(err).Caller().Send()
-				return err
-			}
-			log.Info().Str("Key", remoteKey).Msg("加载远程定制配置成功")
-		}
+	log.Info().Str("路径", filePath).Msg("加载本地配置文件")
+	return
+}
+
+// 设置服务ID
+func SetServiceID(id string) (err error) {
+	if id == "" {
+		err = errors.New("服务ID不能为空")
+		log.Err(err).Caller().Str("ID", id).Msg("设置服务ID失败")
+		return
 	}
-	log.Info().Strs("etcd", Config.Etcd.Endpoints).Msg("远程配置加载")
-	return nil
+	Config.ServiceID = id
+	return
 }

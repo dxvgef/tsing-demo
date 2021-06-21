@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,8 +20,17 @@ var engine *tsing.Engine
 var httpServer *http.Server
 
 // 配置引擎
-func Config() {
-	var config tsing.Config
+func setService() (err error) {
+	var (
+		config   tsing.Config
+		rootPath string
+	)
+	if global.Config.ServiceCenter.Addr != "" {
+		if _, err = net.ResolveTCPAddr("tcp", global.Config.ServiceCenter.Addr); err != nil {
+			log.Err(err).Caller().Str("addr", global.Config.ServiceCenter.Addr).Msg("服务中心参数值异常")
+			return
+		}
+	}
 	config.EventHandler = handler.EventHandler
 	config.Recover = true
 	config.EventShortPath = true
@@ -29,7 +39,7 @@ func Config() {
 		config.EventTrace = true
 	}
 	config.EventHandlerError = true // 一定要处理handler返回的错误
-	rootPath, err := os.Getwd()
+	rootPath, err = os.Getwd()
 	if err == nil {
 		config.RootPath = rootPath + "/src/"
 	}
@@ -55,25 +65,30 @@ func Config() {
 			ReadHeaderTimeout: time.Duration(global.Config.Service.ReadHeaderTimeout) * time.Second, // http header读取超时
 		}
 	}
+	return
 }
 
 func Start() (err error) {
-	// 配置服务
-	Config()
+	// 设置服务
+	if err = setService(); err != nil {
+		return
+	}
 
-	// 启动http服务
 	if global.Config.Service.HTTPPort > 0 {
+		// 启动http服务
 		go func() {
 			log.Info().Str("监听地址", httpServer.Addr).Msg("启动HTTP服务")
 			if err = httpServer.ListenAndServe(); err != nil {
 				if err.Error() == http.ErrServerClosed.Error() {
 					log.Info().Msg("HTTP服务已关闭")
 				} else {
-					log.Err(err).Str("监听地址", httpServer.Addr).Caller().Msg("启动HTTP服务失败")
+					log.Fatal().Err(err).Str("addr", httpServer.Addr).Caller().Msg("启动HTTP服务失败")
 				}
 				return
 			}
 		}()
+	} else {
+		log.Warn().Uint16("HTTP Port", global.Config.Service.HTTPPort).Msg("HTTP服务未启用")
 	}
 
 	// 设置服务中心
@@ -91,7 +106,7 @@ func Start() (err error) {
 	defer cancel()
 	if httpServer != nil {
 		if err = httpServer.Shutdown(ctx); err != nil {
-			log.Fatal().Caller().Msg(err.Error()) // nolint:gocritic
+			log.Err(err).Caller().Msg("HTTP服务关闭时出现异常")
 		}
 	}
 	return

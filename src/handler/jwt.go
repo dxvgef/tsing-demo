@@ -21,7 +21,7 @@ func (*JWTHandler) Auth(ctx *tsing.Context) error {
 	if tokenStr == "" {
 		return ctx.Status(400)
 	}
-	claims, err := jwt.RSACheck([]byte(tokenStr), global.PrivateKey.GetPublicKey().ToRaw())
+	claims, err := jwt.RSACheck(global.StrToBytes(tokenStr), global.PrivateKey.GetPublicKey().ToRaw())
 	if err != nil {
 		return ctx.Caller(err)
 	}
@@ -46,5 +46,5 @@ func (*JWTHandler) Sign(ctx *tsing.Context) (err error) {
 	if err != nil {
 		return ctx.Caller(err)
 	}
-	return ctx.String(200, string(tokenBytes))
+	return ctx.String(200, global.BytesToStr(tokenBytes))
 }

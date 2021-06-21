@@ -3,6 +3,7 @@ package global
 import (
 	"context"
 	"errors"
+	"net"
 	"time"
 
 	"github.com/go-pg/pg/v10"
@@ -17,8 +18,10 @@ type QueryHook struct{}
 // BeforeQuery 查询前钩子
 func (QueryHook) BeforeQuery(ctx context.Context, qe *pg.QueryEvent) (context.Context, error) {
 	// 自动重连数据库
-	if err := SetDatabase(); err != nil {
-		log.Err(err).Caller().Send()
+	if DB == nil {
+		if err := SetDatabase(); err != nil {
+
+		}
 	}
 	return ctx, nil
 }
@@ -39,26 +42,25 @@ func (QueryHook) AfterQuery(ctx context.Context, qe *pg.QueryEvent) error {
 	return nil
 }
 
-// SetDatabase 设置数据库
+// 设置数据库
 func SetDatabase() (err error) {
 	// 判断是否需要重启赋值
 	if DB != nil {
-		return nil
+		return
 	}
 	// 读取配置文件
-	if Config.Database.Addr == "" {
-		err = errors.New("配置文件[database]节点的addr参数不正确")
-		log.Err(err).Caller().Msg("数据库配置失败")
+	if _, err = net.ResolveTCPAddr("tcp", Config.Database.Addr); err != nil {
+		log.Err(err).Caller().Str("addr", Config.Database.Addr).Msg("数据库配置失败")
 		return
 	}
 	if Config.Database.User == "" {
-		err = errors.New("配置文件[database]节点的user参数不正确")
-		log.Err(err).Caller().Msg("数据库配置失败")
+		err = errors.New("user参数不正确")
+		log.Err(err).Caller().Str("user", Config.Database.User).Msg("数据库配置失败")
 		return
 	}
 	if Config.Database.Name == "" {
-		err = errors.New("配置文件[database]节点的name参数不正确")
-		log.Err(err).Caller().Msg("数据库配置失败")
+		err = errors.New("name参数不正确")
+		log.Err(err).Caller().Str("name", Config.Database.Name).Msg("数据库配置失败")
 		return
 	}
 
@@ -77,5 +79,5 @@ func SetDatabase() (err error) {
 	// 注册钩子
 	DB.AddQueryHook(QueryHook{})
 
-	return nil
+	return
 }

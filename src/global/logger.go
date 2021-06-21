@@ -58,9 +58,9 @@ func SetLogger() (err error) {
 		case "error":
 			zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 		default:
-			err = errors.New("logger.level配置参数值无效")
-			log.Err(err).Str("logger.level", Config.Logger.Level).Msg(err.Error())
-			return err
+			err = errors.New("level参数值无效")
+			log.Err(err).Str("level", Config.Logger.Level).Msg("配置Logger失败")
+			return
 		}
 	}
 
@@ -78,8 +78,8 @@ func SetLogger() (err error) {
 		// 打开文件
 		logFile, err = os.OpenFile(Config.Logger.FilePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, Config.Logger.FileMode)
 		if nil != err {
-			log.Err(err).Caller().Msg("无法访问日志文件")
-			return err
+			log.Err(err).Caller().Msg("配置Logger失败")
+			return
 		}
 	}
 
@@ -108,12 +108,12 @@ func SetLogger() (err error) {
 			output = os.Stdout
 		}
 	default:
-		err = errors.New("logger.encode配置参数值只支持json和console")
-		log.Err(err).Caller().Msg("解析logger配置参数值失败")
-		return err
+		err = errors.New("encode参数值只支持json和console")
+		log.Fatal().Err(err).Caller().Msg("配置Logger失败")
+		return
 	}
 
 	log.Logger = log.Output(output)
 
-	return nil
+	return
 }
