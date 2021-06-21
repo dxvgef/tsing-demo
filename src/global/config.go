@@ -11,11 +11,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const LOCAL = "local"
-
 // 启动参数
 var LaunchFlag struct {
-	ConfigSource string // 配置来源(local或者服务中心地址'127.0.0.1:10000')
+	ConfigSource string // 配置来源(file或者服务中心地址'127.0.0.1:10000')
 	Env          string // 环境变量
 }
 
@@ -106,9 +104,7 @@ var Config struct {
 // 设置本地默认配置
 func defaultConfig() {
 	// 环境变量
-	LaunchFlag.ConfigSource = LOCAL
-	// LaunchFlag.Env = LOCAL
-	// LaunchFlag.ServiceID = ""
+	LaunchFlag.ConfigSource = "file"
 
 	// 服务默认配置
 	Config.Debug = true
@@ -154,7 +150,7 @@ func LoadConfig() (err error) {
 	defaultConfig()
 
 	// 解析启动参数
-	flag.StringVar(&LaunchFlag.ConfigSource, "cfg", LaunchFlag.ConfigSource, "配置来源，可以是'local'表示本地或者配置中心地址'ip:port'，默认'local'")
+	flag.StringVar(&LaunchFlag.ConfigSource, "cfg", LaunchFlag.ConfigSource, "配置来源，可以是file表示本地配置文件或者配置中心地址ip:port，默认file")
 	flag.StringVar(&LaunchFlag.Env, "env", LaunchFlag.Env, "环境变量，默认为空")
 	flag.Parse()
 
@@ -164,7 +160,7 @@ func LoadConfig() (err error) {
 	log.Info().Str("配置来源(cfg)", LaunchFlag.ConfigSource).Str("环境变量(env)", LaunchFlag.Env).Msg("启动参数")
 
 	// 加载本地配置文件
-	if LaunchFlag.ConfigSource == LOCAL {
+	if LaunchFlag.ConfigSource == "file" {
 		// 加载本地配置文件
 		return loadConfigFile()
 	}
@@ -180,9 +176,9 @@ func loadConfigFile() (err error) {
 	if LaunchFlag.Env == "" {
 		filePath = "./config.toml"
 	} else {
-		filePath = filepath.Clean("./config." + LaunchFlag.Env + ".toml")
+		filePath = "./config." + LaunchFlag.Env + ".toml"
 	}
-	file, err = os.Open(filePath) // nolint:gosec
+	file, err = os.Open(filepath.Clean(filePath))
 	if err != nil {
 		log.Err(err).Caller().Str("path", filePath).Send()
 		return
