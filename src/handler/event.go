@@ -18,13 +18,13 @@ func EventHandler(event *tsing.Event) {
 	// 根据状态码做不同的日志记录
 	switch event.Status {
 	case 404:
-		if global.Config.Service.EventNotFound {
+		if global.Config.Service.NotFoundEvent {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(http.StatusNotFound))
 		}
 	case 405:
-		if global.Config.Service.EventMethodNotAllowed {
+		if global.Config.Service.MethodNotAllowedEvent {
 			log.Error().Int("status", event.Status).
 				Str("method", event.Request.Method).
 				Str("uri", event.Request.RequestURI).Msg(http.StatusText(http.StatusMethodNotAllowed))

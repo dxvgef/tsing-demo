@@ -33,8 +33,8 @@ var Config struct {
 		HTTPPort              uint16 `json:"http_port" toml:"http_port"`
 		HTTPSPort             uint16 `json:"https_port" toml:"https_port"`
 		HTTP2                 bool   `json:"http2" toml:"http2"`
-		EventNotFound         bool   `json:"event_not_found" toml:"event_not_found"`
-		EventMethodNotAllowed bool   `json:"event_method_not_allowed" toml:"event_method_not_allowed"`
+		NotFoundEvent         bool   `json:"not_found_event" toml:"not_found_event"`
+		MethodNotAllowedEvent bool   `json:"method_not_allowed_event" toml:"method_not_allowed_event"`
 	} `json:"service" toml:"service"`
 
 	Logger struct {
@@ -114,8 +114,8 @@ func defaultConfig() {
 	Config.Service.IdleTimeout = 10
 	Config.Service.QuitWaitTimeout = 5
 	Config.Service.HTTPPort = 80
-	Config.Service.EventNotFound = true
-	Config.Service.EventMethodNotAllowed = true
+	Config.Service.NotFoundEvent = true
+	Config.Service.MethodNotAllowedEvent = true
 
 	// 日志默认配置
 	Config.Logger.Level = "debug"
